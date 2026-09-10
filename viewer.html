@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏎️ 智慧電動車 3D 組合裝配與分解檢視器</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0b0d13;
+      color: #e2e8f0;
+      overflow: hidden;
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    #viewport {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+    }
+    /* 側邊控制面板 */
+    #sidebar {
+      width: 340px;
+      background: rgba(18, 22, 34, 0.92);
+      backdrop-filter: blur(14px);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      gap: 16px;
+      z-index: 10;
+      box-shadow: -6px 0 30px rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .panel-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+    }
+    .slider-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .checkbox-item input {
+      accent-color: #38bdf8;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    button {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f1f5f9;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    button:hover {
+      background: #334155;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    /* 車身選色 */
+    .color-picker {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .color-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s;
+    }
+    .color-dot:hover { transform: scale(1.2); }
+    .color-dot.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    /* 懸浮頂部標籤 */
+    #badge-box {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    #badge-box h3 {
+      font-size: 1rem;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #badge-box p {
+      font-size: 0.82rem;
+      color: #94a3b8;
+    }
+    #stats {
+      font-size: 0.76rem;
+      color: #64748b;
+      margin-top: auto;
+      line-height: 1.5;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+</head>
+<body>
+
+  <div id="viewport">
+    <div id="canvas-container"></div>
+    <div id="badge-box">
+      <h3>🏎️ 智慧電動車 3D 完整組合版</h3>
+      <p>拖曳滑鼠 360° 旋轉 | 右鍵平移 | 滾輪縮放</p>
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <h2>🏎️ 裝配體控制台</h2>
+
+    <!-- 爆炸圖控制器 -->
+    <div class="panel-section">
+      <div class="panel-title">
+        <span>💥 組裝 / 分解爆炸圖</span>
+        <span id="explode-val" style="color:#38bdf8">0%</span>
+      </div>
+      <div class="slider-container">
+        <input type="range" id="explodeRange" min="0" max="100" value="0" oninput="onExplodeChange(this.value)">
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#64748b;">
+          <span>完美合體</span>
+          <span>零件展開</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 零件獨立顯隱 -->
+    <div class="panel-section">
+      <div class="panel-title">部件獨立顯隱</div>
+      <div class="checkbox-group">
+        <label class="checkbox-item">
+          <input type="checkbox" id="chkBody" checked onchange="togglePart('body', this.checked)">
+          <span>🏁 流線跑車外殼 (Car Body)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="chkChassis" checked onchange="togglePart('chassis', this.checked)">
+          <span>🔧 工程底盤與電池架 (Chassis)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="chkWheels" checked onchange="togglePart('wheels', this.checked)">
+          <span>🛞 4 輪總成 (Wheels & Rims)</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 車身烤漆顏色 -->
+    <div class="panel-section">
+      <div class="panel-title">車身跑車烤漆</div>
+      <div class="color-picker">
+        <div class="color-dot active" style="background: #ef4444;" title="法拉利紅" onclick="setBodyColor(0xef4444, this)"></div>
+        <div class="color-dot" style="background: #0284c7;" title="賽車電光藍" onclick="setBodyColor(0x0284c7, this)"></div>
+        <div class="color-dot" style="background: #f8fafc;" title="珍珠白" onclick="setBodyColor(0xf8fafc, this)"></div>
+        <div class="color-dot" style="background: #f59e0b;" title="競速黃" onclick="setBodyColor(0xf59e0b, this)"></div>
+        <div class="color-dot" style="background: #10b981;" title="極速綠" onclick="setBodyColor(0x10b981, this)"></div>
+        <div class="color-dot" style="background: #1e293b;" title="暗夜黑" onclick="setBodyColor(0x1e293b, this)"></div>
+      </div>
+    </div>
+
+    <!-- 視圖切換與動作 -->
+    <div class="panel-section">
+      <div class="panel-title">相機與動畫</div>
+      <div class="btn-group">
+        <button onclick="toggleAutoRotate()">🔄 自動旋轉</button>
+        <button onclick="resetCamera()">🎯 重置視角</button>
+        <button onclick="setView('top')">📐 上視圖</button>
+        <button onclick="setView('side')">📐 側視圖</button>
+      </div>
+    </div>
+
+    <!-- 本地檔案載入 -->
+    <div class="panel-section">
+      <div class="panel-title">載入自訂 STL</div>
+      <input type="file" id="customFileInput" accept=".stl" style="display:none" onchange="loadCustomSTL(this.files[0])">
+      <button onclick="document.getElementById('customFileInput').click()" style="width:100%; text-align:center;">
+        📂 開啟本機其他 STL 檔案
+      </button>
+    </div>
+
+    <div id="stats">
+      規格說明：<br>
+      • 總長 156mm × 寬 88mm × 高 48mm<br>
+      • 軸距 96mm / 輪徑 Ø36mm<br>
+      • 內建 18650 鋰電池倉與 M2.5 螺柱
+    </div>
+  </div>
+
+  <script>
+    let scene, camera, renderer, controls;
+    let autoRotate = false;
+    let carGroup, bodyGroup, chassisGroup, wheelsGroup = [];
+    let bodyMaterial, chassisMaterial, tireMaterial, rimMaterial;
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b0d13);
+
+      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
+      camera.position.set(190, 150, 220);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true;
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.target.set(0, 15, 0);
+
+      // 燈光系統
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xffffff, 0.85);
+      mainLight.position.set(160, 240, 180);
+      scene.add(mainLight);
+
+      const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+      fillLight.position.set(-160, -80, -160);
+      scene.add(fillLight);
+
+      // 底面科技格線
+      const grid = new THREE.GridHelper(300, 30, 0x38bdf8, 0x1e293b);
+      grid.position.y = -0.1;
+      scene.add(grid);
+
+      // 材質定義
+      bodyMaterial = new THREE.MeshStandardMaterial({
+        color: 0xef4444,
+        metalness: 0.5,
+        roughness: 0.25
+      });
+
+      chassisMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        metalness: 0.2,
+        roughness: 0.7
+      });
+
+      tireMaterial = new THREE.MeshStandardMaterial({
+        color: 0x111827,
+        metalness: 0.1,
+        roughness: 0.8
+      });
+
+      rimMaterial = new THREE.MeshStandardMaterial({
+        color: 0xe2e8f0,
+        metalness: 0.8,
+        roughness: 0.2
+      });
+
+      // 建立電動車複合裝配體
+      buildCarModel();
+
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    }
+
+    function buildCarModel() {
+      carGroup = new THREE.Group();
+      scene.add(carGroup);
+
+      // 1. 底盤系統 (Chassis Group)
+      chassisGroup = new THREE.Group();
+      
+      // 主底板
+      const plateGeo = new THREE.BoxGeometry(140, 4, 60);
+      const plateMesh = new THREE.Mesh(plateGeo, chassisMaterial);
+      plateMesh.position.y = 8;
+      chassisGroup.add(plateMesh);
+
+      // 電池槽外框 (18650 Bay)
+      const batWallGeo = new THREE.BoxGeometry(72, 8, 22);
+      const batWallMesh = new THREE.Mesh(batWallGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 }));
+      batWallMesh.position.set(0, 12, 0);
+      chassisGroup.add(batWallMesh);
+
+      // 18650 電池本體
+      const batCylGeo = new THREE.CylinderGeometry(8.5, 8.5, 65, 16);
+      const batMat = new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.6, roughness: 0.3 });
+      const batMesh = new THREE.Mesh(batCylGeo, batMat);
+      batMesh.rotation.z = Math.PI / 2;
+      batMesh.position.set(0, 12, 0);
+      chassisGroup.add(batMesh);
+
+      // 前後軸承安裝座
+      for (let ax of [48, -48]) {
+        for (let az of [26, -26]) {
+          const mountGeo = new THREE.BoxGeometry(12, 10, 8);
+          const mountMesh = new THREE.Mesh(mountGeo, chassisMaterial);
+          mountMesh.position.set(ax, 11, az);
+          chassisGroup.add(mountMesh);
+        }
+      }
+      carGroup.add(chassisGroup);
+
+      // 2. 流線車殼 (Body Group)
+      bodyGroup = new THREE.Group();
+
+      // 下半部主車身
+      const lowerGeo = new THREE.BoxGeometry(150, 14, 66);
+      const lowerMesh = new THREE.Mesh(lowerGeo, bodyMaterial);
+      lowerMesh.position.set(0, 17, 0);
+      bodyGroup.add(lowerMesh);
+
+      // 上座艙 / 玻璃駕駛頂棚 (Cockpit Dome)
+      const cabinGeo = new THREE.BoxGeometry(70, 16, 50);
+      const cabinMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.1 });
+      const cabinMesh = new THREE.Mesh(cabinGeo, cabinMat);
+      cabinMesh.position.set(-6, 29, 0);
+      bodyGroup.add(cabinMesh);
+
+      // 前擋風斜面
+      const slopeGeo = new THREE.BoxGeometry(32, 4, 48);
+      const slopeMesh = new THREE.Mesh(slopeGeo, cabinMat);
+      slopeMesh.rotation.z = Math.PI / 5;
+      slopeMesh.position.set(24, 27, 0);
+      bodyGroup.add(slopeMesh);
+
+      // 前引擎蓋斜切
+      const hoodGeo = new THREE.BoxGeometry(45, 6, 62);
+      const hoodMesh = new THREE.Mesh(hoodGeo, bodyMaterial);
+      hoodMesh.rotation.z = -Math.PI / 14;
+      hoodMesh.position.set(50, 21, 0);
+      bodyGroup.add(hoodMesh);
+
+      // 前 LED 貫穿大燈
+      const lightGeo = new THREE.BoxGeometry(4, 3, 50);
+      const lightMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.8 });
+      const lightMesh = new THREE.Mesh(lightGeo, lightMat);
+      lightMesh.position.set(75, 17, 0);
+      bodyGroup.add(lightMesh);
+
+      // 後擾流尾翼 (Spoiler)
+      const wingGeo = new THREE.BoxGeometry(12, 3, 62);
+      const wingMesh = new THREE.Mesh(wingGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 }));
+      wingMesh.position.set(-70, 27, 0);
+      bodyGroup.add(wingMesh);
+
+      carGroup.add(bodyGroup);
+
+      // 3. 四顆運動輪組 (Wheels)
+      const wheelPositions = [
+        { name: 'FL', x: 48, z: 38 },
+        { name: 'FR', x: 48, z: -38 },
+        { name: 'RL', x: -48, z: 38 },
+        { name: 'RR', x: -48, z: -38 }
+      ];
+
+      wheelsGroup = [];
+      for (let pos of wheelPositions) {
+        const singleWheel = new THREE.Group();
+        singleWheel.userData = { origX: pos.x, origZ: pos.z, isLeft: pos.z > 0 };
+
+        // 黑色橡膠胎
+        const tireGeo = new THREE.CylinderGeometry(17, 17, 13, 24);
+        const tireMesh = new THREE.Mesh(tireGeo, tireMaterial);
+        tireMesh.rotation.x = Math.PI / 2;
+        singleWheel.add(tireMesh);
+
+        // 銀色金屬輪圈
+        const rimGeo = new THREE.CylinderGeometry(11, 11, 13.5, 16);
+        const rimMesh = new THREE.Mesh(rimGeo, rimMaterial);
+        rimMesh.rotation.x = Math.PI / 2;
+        singleWheel.add(rimMesh);
+
+        // 輪圈中心軸孔
+        const hubGeo = new THREE.CylinderGeometry(4, 4, 14, 12);
+        const hubMesh = new THREE.Mesh(hubGeo, new THREE.MeshStandardMaterial({ color: 0x090d16 }));
+        hubMesh.rotation.x = Math.PI / 2;
+        singleWheel.add(hubMesh);
+
+        singleWheel.position.set(pos.x, 17, pos.z);
+        carGroup.add(singleWheel);
+        wheelsGroup.push(singleWheel);
+      }
+    }
+
+    // 爆炸圖拉動
+    function onExplodeChange(val) {
+      const progress = val / 100;
+      document.getElementById('explode-val').innerText = val + '%';
+
+      // 車殼垂直向上飄起
+      bodyGroup.position.y = progress * 48;
+
+      // 輪子向外側展開
+      for (let w of wheelsGroup) {
+        const offset = (w.userData.isLeft ? 1 : -1) * progress * 35;
+        w.position.z = w.userData.origZ + offset;
+      }
+
+      // 底盤微幅下沉展示
+      chassisGroup.position.y = -progress * 15;
+    }
+
+    // 部件獨立顯隱
+    function togglePart(part, visible) {
+      if (part === 'body') bodyGroup.visible = visible;
+      if (part === 'chassis') chassisGroup.visible = visible;
+      if (part === 'wheels') {
+        for (let w of wheelsGroup) w.visible = visible;
+      }
+    }
+
+    // 更換車身跑車烤漆
+    function setBodyColor(hex, element) {
+      bodyMaterial.color.setHex(hex);
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      if (element) element.classList.add('active');
+    }
+
+    function toggleAutoRotate() {
+      autoRotate = !autoRotate;
+    }
+
+    function resetCamera() {
+      camera.position.set(190, 150, 220);
+      controls.target.set(0, 15, 0);
+      controls.update();
+    }
+
+    function setView(view) {
+      if (view === 'top') {
+        camera.position.set(0, 280, 0);
+      } else if (view === 'side') {
+        camera.position.set(0, 25, 260);
+      }
+      controls.target.set(0, 15, 0);
+      controls.update();
+    }
+
+    // 自訂 STL 載入
+    function loadCustomSTL(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const loader = new THREE.STLLoader();
+        const geometry = loader.parse(e.target.result);
+        geometry.computeVertexNormals();
+
+        // 隱藏預設裝配體，顯示單一載入的 STL
+        carGroup.visible = false;
+
+        const customMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.4, roughness: 0.3 });
+        const customMesh = new THREE.Mesh(geometry, customMat);
+        geometry.center();
+        scene.add(customMesh);
+        document.getElementById('badge-box').innerHTML = `<h3>📂 已載入自訂檔案</h3><p>${file.name}</p>`;
+        resetCamera();
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('canvas-container');
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (autoRotate && carGroup) {
+        carGroup.rotation.y += 0.008;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

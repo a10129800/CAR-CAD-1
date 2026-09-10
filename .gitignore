@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+
+# Cache
+.cache/
+.agents/
+*.log
+
+# System
+.DS_Store
+Thumbs.db
+test.txt

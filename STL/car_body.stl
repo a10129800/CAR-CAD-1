@@ -1,0 +1,240 @@
+solid car_body
+  facet normal 0 0 1
+    outer loop
+      vertex -68 -32 12
+      vertex 25 32 12
+      vertex 25 -32 12
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -68 -32 12
+      vertex -68 32 12
+      vertex 25 32 12
+    endloop
+  endfacet
+  facet normal 0.17 0 0.98
+    outer loop
+      vertex 25 -32 12
+      vertex 72 26 4
+      vertex 72 -26 4
+    endloop
+  endfacet
+  facet normal 0.17 0 0.98
+    outer loop
+      vertex 25 -32 12
+      vertex 25 32 12
+      vertex 72 26 4
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 72 -26 0
+      vertex 72 26 0
+      vertex 72 26 4
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 72 -26 0
+      vertex 72 26 4
+      vertex 72 -26 4
+    endloop
+  endfacet
+  facet normal -0.15 0 0.98
+    outer loop
+      vertex -72 -28 6
+      vertex -68 -32 12
+      vertex -68 32 12
+    endloop
+  endfacet
+  facet normal -0.15 0 0.98
+    outer loop
+      vertex -72 -28 6
+      vertex -68 32 12
+      vertex -72 28 6
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -72 -28 0
+      vertex -72 -28 6
+      vertex -72 28 6
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -72 -28 0
+      vertex -72 28 6
+      vertex -72 28 0
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -72 28 0
+      vertex 72 26 0
+      vertex 72 26 4
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -72 28 0
+      vertex 72 26 4
+      vertex -72 28 6
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -68 32 4
+      vertex 25 32 4
+      vertex 25 32 12
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -68 32 4
+      vertex 25 32 12
+      vertex -68 32 12
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -72 -28 0
+      vertex -72 -28 6
+      vertex 72 -26 4
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -72 -28 0
+      vertex 72 -26 4
+      vertex 72 -26 0
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -68 -32 4
+      vertex -68 -32 12
+      vertex 25 -32 12
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -68 -32 4
+      vertex 25 -32 12
+      vertex 25 -32 4
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -18 -24 28
+      vertex 8 24 28
+      vertex 8 -24 28
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -18 -24 28
+      vertex -18 24 28
+      vertex 8 24 28
+    endloop
+  endfacet
+  facet normal 0.72 0 0.69
+    outer loop
+      vertex 24 -26 12
+      vertex 8 24 28
+      vertex 8 -24 28
+    endloop
+  endfacet
+  facet normal 0.72 0 0.69
+    outer loop
+      vertex 24 -26 12
+      vertex 24 26 12
+      vertex 8 24 28
+    endloop
+  endfacet
+  facet normal -0.55 0 0.83
+    outer loop
+      vertex -40 -26 12
+      vertex -18 -24 28
+      vertex -18 24 28
+    endloop
+  endfacet
+  facet normal -0.55 0 0.83
+    outer loop
+      vertex -40 -26 12
+      vertex -18 24 28
+      vertex -40 26 12
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex 24 26 12
+      vertex 8 24 28
+      vertex -18 24 28
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex 24 26 12
+      vertex -18 24 28
+      vertex -40 26 12
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 24 -26 12
+      vertex -18 -24 28
+      vertex 8 -24 28
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 24 -26 12
+      vertex -40 -26 12
+      vertex -18 -24 28
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -70 -28 14
+      vertex -64 28 14
+      vertex -64 -28 14
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -70 -28 14
+      vertex -70 28 14
+      vertex -64 28 14
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -67 -18 8
+      vertex -65 -15 14
+      vertex -65 -18 14
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -67 18 8
+      vertex -65 18 14
+      vertex -65 15 14
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -66 -28 2
+      vertex 66 -24 2
+      vertex 66 24 2
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -66 -28 2
+      vertex 66 24 2
+      vertex -66 28 2
+    endloop
+  endfacet
+endsolid car_body

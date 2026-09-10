@@ -1,0 +1,198 @@
+solid print_bed_kit
+  facet normal 0 0 -1
+    outer loop
+      vertex -70 -75 0
+      vertex 70 -75 0
+      vertex 70 -15 0
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -70 -75 0
+      vertex 70 -15 0
+      vertex -70 -15 0
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -70 -75 4
+      vertex 70 -15 4
+      vertex 70 -75 4
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -70 -75 4
+      vertex -70 -15 4
+      vertex 70 -15 4
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 70 -75 0
+      vertex 70 -15 0
+      vertex 70 -15 4
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 70 -75 0
+      vertex 70 -15 4
+      vertex 70 -75 4
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -70 -75 0
+      vertex -70 -75 4
+      vertex -70 -15 4
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -70 -75 0
+      vertex -70 -15 4
+      vertex -70 -15 0
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -70 -15 0
+      vertex 70 -15 0
+      vertex 70 -15 4
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -70 -15 0
+      vertex 70 -15 4
+      vertex -70 -15 4
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -70 -75 0
+      vertex -70 -75 4
+      vertex 70 -75 4
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -70 -75 0
+      vertex 70 -75 4
+      vertex 70 -75 0
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -36 -57 12
+      vertex 36 -33 12
+      vertex 36 -57 12
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -36 -57 12
+      vertex -36 -33 12
+      vertex 36 -33 12
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -68 13 12
+      vertex 25 77 12
+      vertex 25 13 12
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -68 13 12
+      vertex -68 77 12
+      vertex 25 77 12
+    endloop
+  endfacet
+  facet normal 0.17 0 0.98
+    outer loop
+      vertex 25 13 12
+      vertex 72 71 4
+      vertex 72 19 4
+    endloop
+  endfacet
+  facet normal 0.17 0 0.98
+    outer loop
+      vertex 25 13 12
+      vertex 25 77 12
+      vertex 72 71 4
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -18 21 28
+      vertex 8 69 28
+      vertex 8 21 28
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -18 21 28
+      vertex -18 69 28
+      vertex 8 69 28
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -85 -10 14
+      vertex -85 10 14
+      vertex -75 0 14
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -85 -10 0
+      vertex -75 0 0
+      vertex -85 10 0
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -85 -40 14
+      vertex -85 -20 14
+      vertex -75 -30 14
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -85 -40 0
+      vertex -75 -30 0
+      vertex -85 -20 0
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex 85 -10 14
+      vertex 75 0 14
+      vertex 85 10 14
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex 85 -10 0
+      vertex 85 10 0
+      vertex 75 0 0
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex 85 -40 14
+      vertex 75 -30 14
+      vertex 85 -20 14
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex 85 -40 0
+      vertex 85 -20 0
+      vertex 75 -30 0
+    endloop
+  endfacet
+endsolid print_bed_kit
