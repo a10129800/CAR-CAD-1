@@ -3,482 +3,1156 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏎️ Smart EV Prototype - 3D 智慧電動車 CAD 互動展示</title>
-  <meta name="description" content="基於 Python 與 build123d 打造的開源參數化智慧電動跑車模型，支援 3D 線上組裝與爆炸分解檢視、STL 檔案下載與 3D 列印。">
-  <meta property="og:title" content="🏎️ Smart EV Prototype - 3D 智慧電動車 CAD 互動展示">
-  <meta property="og:description" content="3D 線上組裝與爆炸分解檢視、STL 下載與 3D 列印。">
+  <title>⚡ CYBER EV HYPERCAR - 3D 智慧極速超跑 CAD 互動展示</title>
+  <meta name="description" content="極致流線曲面未來賽博電動超跑 (Cyber EV Hypercar)，具備空氣動力學曲面車體、水滴型戰鬥座艙、天鵝頸主動尾翼、底盤結構與 360° 仰視檢視。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   
   <style>
+    :root {
+      --primary: #00f0ff;
+      --primary-glow: rgba(0, 240, 255, 0.45);
+      --accent: #ff0055;
+      --accent-glow: rgba(255, 0, 85, 0.45);
+      --bg-dark: #07090e;
+      --panel-bg: rgba(10, 14, 23, 0.86);
+      --panel-border: rgba(0, 240, 255, 0.22);
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: #0b0d13;
-      color: #e2e8f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
       overflow: hidden;
       display: flex;
       height: 100vh;
       width: 100vw;
+      user-select: none;
     }
+
     #viewport {
       flex: 1;
       height: 100%;
       position: relative;
+      background: radial-gradient(circle at 50% 45%, #10192e 0%, #06080d 80%);
     }
+
     #canvas-container {
       width: 100%;
       height: 100%;
     }
-    /* 側邊控制面板 */
-    #sidebar {
-      width: 360px;
-      background: rgba(18, 22, 34, 0.94);
+
+    /* 頂部賽博 HUD 儀表疊層 */
+    #hud-topbar {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(8, 12, 20, 0.88);
       backdrop-filter: blur(16px);
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 240, 255, 0.08);
+      pointer-events: auto;
+    }
+
+    .brand-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, #00f0ff 0%, #7000ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #00ff88;
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #00ff88;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ff88;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* 車載即時遙測 HUD 資訊卡 */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(5, auto);
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .telemetry-card {
+      background: rgba(8, 12, 20, 0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 6px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: all 0.25s;
+    }
+
+    .telemetry-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .telemetry-label {
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    .telemetry-val {
+      font-size: 1.05rem;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .telemetry-val span {
+      font-size: 0.68rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      color: var(--primary);
+      margin-left: 2px;
+    }
+
+    /* 快捷相機提示 */
+    .view-help {
+      position: absolute;
+      bottom: 22px;
+      left: 24px;
+      background: rgba(8, 12, 20, 0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      display: flex;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .view-help span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .view-help kbd {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+    }
+
+    /* 側邊高科技控制面板 */
+    #sidebar {
+      width: 380px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(24px);
+      border-left: 1px solid var(--panel-border);
       display: flex;
       flex-direction: column;
       padding: 22px;
       gap: 14px;
-      z-index: 10;
-      box-shadow: -8px 0 32px rgba(0, 0, 0, 0.7);
+      z-index: 20;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8), inset 1px 0 0 rgba(0, 240, 255, 0.15);
       overflow-y: auto;
     }
-    #sidebar::-webkit-scrollbar { width: 6px; }
+
+    #sidebar::-webkit-scrollbar { width: 5px; }
     #sidebar::-webkit-scrollbar-track { background: transparent; }
-    #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-    
-    h2 {
-      font-size: 1.15rem;
+    #sidebar::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.25); border-radius: 10px; }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .panel-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: #38bdf8;
+      letter-spacing: 0.08em;
+      color: #fff;
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
+    .panel-header h2 span { color: var(--primary); }
+
     .panel-section {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 12px;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.025);
+      padding: 13px;
       border-radius: 10px;
       border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: border-color 0.25s;
     }
+
+    .panel-section:hover {
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+
     .panel-title {
-      font-size: 0.8rem;
+      font-size: 0.76rem;
+      font-family: 'JetBrains Mono', monospace;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #94a3b8;
-      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      font-weight: 600;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
+
     .slider-container {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-    input[type=range] {
-      width: 100%;
-      accent-color: #38bdf8;
-      cursor: pointer;
-    }
-    .checkbox-group {
-      display: flex;
-      flex-direction: column;
       gap: 8px;
     }
-    .checkbox-item {
+
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      background: #1a2333;
+      border-radius: 3px;
+      outline: none;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* 賽博車漆選色球 */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+
+    .color-card {
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
-      cursor: pointer;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .checkbox-item input {
-      accent-color: #38bdf8;
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
+
+    .color-card:hover { transform: translateY(-3px) scale(1.05); }
+
+    .color-card.active {
+      border-color: #fff;
+      box-shadow: 0 0 16px var(--primary-glow);
     }
-    .btn-group {
+
+    .color-card.active::after {
+      content: '✓';
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-shadow: 0 0 4px #000;
+    }
+
+    /* 科技功能切換 Switch */
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .cyber-toggle {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 9px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .cyber-toggle:hover {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: rgba(0, 240, 255, 0.4);
+    }
+
+    .cyber-toggle.active {
+      background: rgba(0, 240, 255, 0.12);
+      border-color: var(--primary);
+      box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.15);
+    }
+
+    .toggle-name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle-sub {
+      font-size: 0.66rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    .cyber-toggle.active .toggle-sub { color: var(--primary); }
+
+    /* 視圖控制按鈕 */
+    .btn-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
-    button, .btn-link {
-      background: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #f1f5f9;
+
+    button.cyber-btn {
+      background: rgba(18, 26, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
       padding: 8px 10px;
       border-radius: 8px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-    }
-    button:hover, .btn-link:hover {
-      background: #334155;
-      border-color: #38bdf8;
-      color: #38bdf8;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #0284c7, #2563eb);
-      border: none;
-      font-weight: 600;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #0369a1, #1d4ed8);
-      color: #fff;
-    }
-    /* 車身選色 */
-    .color-picker {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .color-dot {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: transform 0.2s;
-    }
-    .color-dot:hover { transform: scale(1.2); }
-    .color-dot.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-    
-    /* 頂部浮動抬頭 */
-    #badge-box {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 14px 22px;
-      background: rgba(15, 23, 42, 0.88);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-    #badge-box h1 {
-      font-size: 1.05rem;
-      color: #38bdf8;
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-    #badge-box p {
-      font-size: 0.82rem;
-      color: #94a3b8;
+      justify-content: center;
+      gap: 5px;
     }
 
-    /* 下載區域清單 */
-    .download-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .download-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 7px 10px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-    }
-    .download-item a {
-      color: #38bdf8;
-      text-decoration: none;
-      font-weight: 600;
-      padding: 2px 8px;
-      background: rgba(56, 189, 248, 0.15);
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-    .download-item a:hover {
-      background: #38bdf8;
-      color: #0b0d13;
+    button.cyber-btn:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 12px var(--primary-glow);
     }
 
-    #stats {
-      font-size: 0.76rem;
-      color: #64748b;
-      margin-top: auto;
-      line-height: 1.5;
+    .spec-table {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      line-height: 1.55;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 8px;
     }
   </style>
+
+  <!-- Three.js 核心庫 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
 </head>
 <body>
 
+  <!-- 主 3D 視窗 -->
   <div id="viewport">
     <div id="canvas-container"></div>
-    <div id="badge-box">
-      <h1>🏎️ Smart EV Prototype 3D CAD</h1>
-      <p>滑鼠左鍵 360° 旋轉 | 右鍵平移視角 | 滾輪縮放</p>
+
+    <!-- 頂部高科技 HUD 資訊儀表 -->
+    <div id="hud-topbar">
+      <div class="brand-badge">
+        <div class="brand-logo">CYBER HYPERCAR</div>
+        <div class="status-pill">
+          <div class="status-dot"></div>
+          <span>360° UNIFIED AERO</span>
+        </div>
+      </div>
+
+      <div class="telemetry-grid">
+        <div class="telemetry-card">
+          <div class="telemetry-label">0-100 KM/H</div>
+          <div class="telemetry-val">1.82<span>s</span></div>
+        </div>
+        <div class="telemetry-card">
+          <div class="telemetry-label">AWD POWER</div>
+          <div class="telemetry-val">1,150<span>hp</span></div>
+        </div>
+        <div class="telemetry-card">
+          <div class="telemetry-label">AERO DRAG</div>
+          <div class="telemetry-val">0.198<span>Cd</span></div>
+        </div>
+        <div class="telemetry-card">
+          <div class="telemetry-label">DOWNFORCE</div>
+          <div class="telemetry-val">420<span>kgf</span></div>
+        </div>
+        <div class="telemetry-card">
+          <div class="telemetry-label">BATTERY</div>
+          <div class="telemetry-val" style="color:#00ff88">99<span>%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部操作快捷鍵提示 -->
+    <div class="view-help">
+      <span><kbd>滑鼠左鍵</kbd> 360° 空間自由旋轉 (含底盤仰視)</span>
+      <span><kbd>滑鼠右鍵</kbd> 平移視角</span>
+      <span><kbd>滾輪</kbd> 縮放觀察細節</span>
     </div>
   </div>
 
+  <!-- 側邊控制面板 -->
   <div id="sidebar">
-    <h2>🏎️ 裝配與分解控制</h2>
+    <div class="panel-header">
+      <h2>🏎️ CYBER <span>CONTROL</span></h2>
+      <span style="font-size:0.75rem; font-family:'JetBrains Mono'; color:#00f0ff;">v2.6 PRO</span>
+    </div>
 
-    <!-- 爆炸圖控制器 -->
+    <!-- 💥 3D 爆炸分解圖控制器 -->
     <div class="panel-section">
       <div class="panel-title">
-        <span>💥 組裝 / 分解爆炸圖</span>
-        <span id="explode-val" style="color:#38bdf8">0%</span>
+        <span>💥 空力套件 / 分解爆炸圖</span>
+        <span id="explode-val" style="color:var(--primary)">0%</span>
       </div>
       <div class="slider-container">
         <input type="range" id="explodeRange" min="0" max="100" value="0" oninput="onExplodeChange(this.value)">
-        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#64748b;">
-          <span>完美合體</span>
-          <span>零件展開</span>
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); font-family:'JetBrains Mono';">
+          <span>流線合體 (0%)</span>
+          <span>結構展開 (100%)</span>
         </div>
       </div>
     </div>
 
-    <!-- 零件獨立顯隱 -->
+    <!-- 🎨 賽博未來車漆選色 -->
     <div class="panel-section">
-      <div class="panel-title">部件獨立顯隱</div>
-      <div class="checkbox-group">
-        <label class="checkbox-item">
-          <input type="checkbox" id="chkBody" checked onchange="togglePart('body', this.checked)">
-          <span>🏁 流線跑車外殼 (Car Body)</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" id="chkChassis" checked onchange="togglePart('chassis', this.checked)">
-          <span>🔧 工程底盤與電池倉 (Chassis)</span>
-        </label>
-        <label class="checkbox-item">
-          <input type="checkbox" id="chkWheels" checked onchange="togglePart('wheels', this.checked)">
-          <span>🛞 四輪總成 (4x Wheels)</span>
-        </label>
+      <div class="panel-title">🎨 賽博超跑專屬車漆</div>
+      <div class="color-grid">
+        <div class="color-card active" style="background: linear-gradient(135deg, #00f0ff, #0077ff);" title="賽博電光青" onclick="setCarColor(0x00f0ff, this)"></div>
+        <div class="color-card" style="background: linear-gradient(135deg, #a855f7, #6366f1);" title="離子脈衝紫" onclick="setCarColor(0x9333ea, this)"></div>
+        <div class="color-card" style="background: linear-gradient(135deg, #ff0055, #990022);" title="極速赤影紅" onclick="setCarColor(0xff0044, this)"></div>
+        <div class="color-card" style="background: linear-gradient(135deg, #232a3b, #090d16);" title="潛行碳纖黑" onclick="setCarColor(0x1a2130, this)"></div>
+        <div class="color-card" style="background: linear-gradient(135deg, #00ff88, #059669);" title="矩陣毒液綠" onclick="setCarColor(0x00ff88, this)"></div>
+        <div class="color-card" style="background: linear-gradient(135deg, #fbbf24, #d97706);" title="超導流體金" onclick="setCarColor(0xf59e0b, this)"></div>
       </div>
     </div>
 
-    <!-- 車身烤漆顏色 -->
+    <!-- 💡 賽博光效與動態控制 -->
     <div class="panel-section">
-      <div class="panel-title">車身跑車烤漆</div>
-      <div class="color-picker">
-        <div class="color-dot active" style="background: #ef4444;" title="法拉利紅" onclick="setBodyColor(0xef4444, this)"></div>
-        <div class="color-dot" style="background: #0284c7;" title="賽車電光藍" onclick="setBodyColor(0x0284c7, this)"></div>
-        <div class="color-dot" style="background: #f8fafc;" title="珍珠白" onclick="setBodyColor(0xf8fafc, this)"></div>
-        <div class="color-dot" style="background: #f59e0b;" title="競速黃" onclick="setBodyColor(0xf59e0b, this)"></div>
-        <div class="color-dot" style="background: #10b981;" title="極速綠" onclick="setBodyColor(0x10b981, this)"></div>
-        <div class="color-dot" style="background: #1e293b;" title="暗夜黑" onclick="setBodyColor(0x1e293b, this)"></div>
+      <div class="panel-title">⚡ 賽博光電與動態模擬</div>
+      <div class="toggle-grid">
+        <div class="cyber-toggle active" id="btnUnderglow" onclick="toggleUnderglow()">
+          <div class="toggle-name">🌌 車底霓虹燈</div>
+          <div class="toggle-sub">地表氛圍光 ON</div>
+        </div>
+        <div class="cyber-toggle active" id="btnHeadlights" onclick="toggleHeadlights()">
+          <div class="toggle-name">✨ 光刃星環燈</div>
+          <div class="toggle-sub">曲面光帶 ON</div>
+        </div>
+        <div class="cyber-toggle" id="btnWindTunnel" onclick="toggleWindTunnel()">
+          <div class="toggle-name">💨 風洞氣流線</div>
+          <div class="toggle-sub">空力模擬 OFF</div>
+        </div>
+        <div class="cyber-toggle" id="btnDriveSim" onclick="toggleDriveSim()">
+          <div class="toggle-name">🚀 巡航旋轉動態</div>
+          <div class="toggle-sub">輪軸滾動 OFF</div>
+        </div>
       </div>
     </div>
 
-    <!-- 視圖切換與動作 -->
+    <!-- 視圖切換 (包含檢視底部) -->
     <div class="panel-section">
-      <div class="panel-title">視角切換</div>
-      <div class="btn-group">
-        <button onclick="toggleAutoRotate()">🔄 自動旋轉</button>
-        <button onclick="resetCamera()">🎯 重置視角</button>
-        <button onclick="setView('top')">📐 上視俯視</button>
-        <button onclick="setView('side')">📐 側向視圖</button>
+      <div class="panel-title">📐 視角切換 (含底部仰視)</div>
+      <div class="btn-grid">
+        <button class="cyber-btn" style="border-color:var(--primary); color:#00f0ff;" onclick="setView('underbody')">
+          🔍 仰視檢視底盤
+        </button>
+        <button class="cyber-btn" onclick="resetCamera()">🎯 經典超跑視角</button>
+        <button class="cyber-btn" onclick="setView('front')">🏎️ 車頭低趴斜視</button>
+        <button class="cyber-btn" onclick="setView('top')">📐 俯視空力線</button>
+        <button class="cyber-btn" onclick="setView('side')">🔍 側翼沙漏腰身</button>
+        <button class="cyber-btn" onclick="setView('rear')">🏁 天鵝頸雙尾翼</button>
       </div>
     </div>
 
-    <!-- 3D 列印 STL 檔案直接下載區 -->
+    <!-- 3D 列印 STL 檔案下載 -->
     <div class="panel-section">
-      <div class="panel-title">📥 下載 3D 列印 STL 檔案</div>
-      <div class="download-list">
-        <div class="download-item">
-          <span>📦 一體排版組合包</span>
-          <a href="STL/print_bed_kit.stl" download="print_bed_kit.stl">下載</a>
+      <div class="panel-title">📥 3D 列印 CAD / STL 下載</div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(10,16,28,0.8); padding:7px 12px; border-radius:8px; font-size:0.78rem;">
+          <span>📦 一體成型列印組合包</span>
+          <a style="color:var(--primary); text-decoration:none; font-family:'JetBrains Mono'; font-weight:600; padding:3px 8px; background:rgba(0,240,255,0.12); border-radius:6px;" href="STL/print_bed_kit.stl" download>STL</a>
         </div>
-        <div class="download-item">
-          <span>🏎️ 全車組裝模型</span>
-          <a href="STL/electric_car.stl" download="electric_car.stl">下載</a>
-        </div>
-        <div class="download-item">
-          <span>🏁 流線車殼外罩</span>
-          <a href="STL/car_body.stl" download="car_body.stl">下載</a>
-        </div>
-        <div class="download-item">
-          <span>🔧 工程底盤 (電池槽)</span>
-          <a href="STL/chassis.stl" download="chassis.stl">下載</a>
-        </div>
-        <div class="download-item">
-          <span>🛞 車輪模組 (5輻輪框)</span>
-          <a href="STL/wheel.stl" download="wheel.stl">下載</a>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(10,16,28,0.8); padding:7px 12px; border-radius:8px; font-size:0.78rem;">
+          <span>🏎️ 全車裝配體 (Cyber EV)</span>
+          <a style="color:var(--primary); text-decoration:none; font-family:'JetBrains Mono'; font-weight:600; padding:3px 8px; background:rgba(0,240,255,0.12); border-radius:6px;" href="STL/electric_car.stl" download>STL</a>
         </div>
       </div>
     </div>
 
-    <div id="stats">
-      專案資訊：<br>
-      • 規格：長 156mm × 寬 88mm × 高 48mm<br>
-      • 軸距 96mm / 輪徑 Ø36mm<br>
-      • 適合 3D 列印快速成型與創客自走車
+    <!-- 規格參數 -->
+    <div class="spec-table">
+      • 底部構造：平整化低風阻空力底板、文氏管擴散通道、18650 動力電池艙、前後雙馬達驅動軸<br>
+      • 空力套件：一體化流線車身、天鵝頸雙曲面主動尾翼、貫穿式光刃尾燈、車底霓虹燈
     </div>
   </div>
 
   <script>
+    // 全域變數
     let scene, camera, renderer, controls;
-    let autoRotate = false;
-    let carGroup, bodyGroup, chassisGroup, wheelsGroup = [];
-    let bodyMaterial, chassisMaterial, tireMaterial, rimMaterial;
+    let carGroup, bodyGroup, chassisGroup, aeroGroup, wheelsGroup = [];
+    let underglowLight, groundGrid;
+    let windParticles, isWindTunnel = false, isDriving = false, autoRotate = false;
+
+    // 材質
+    let bodyMat, carbonMat, glassMat, ledHeadlightMat, ledTaillightMat;
+    let rimMat, tireMat, brakeDiscMat, brakeCaliperMat, chassisMat, batteryMat;
+    let currentCarColor = 0x00f0ff;
+    let underglowEnabled = true;
+    let headlightsEnabled = true;
 
     function init() {
       const container = document.getElementById('canvas-container');
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0b0d13);
+      scene.background = new THREE.Color(0x06080d);
+      scene.fog = new THREE.FogExp2(0x06080d, 0.0035);
 
-      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
-      camera.position.set(190, 150, 220);
+      camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 2000);
+      camera.position.set(180, 110, 195);
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
       container.appendChild(renderer.domElement);
 
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
+      controls.dampingFactor = 0.06;
       controls.target.set(0, 15, 0);
 
-      // 燈光設置
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-      scene.add(ambientLight);
+      // ★ 允許完全 360° 仰視看底盤 (不再限制最大仰角) ★
+      controls.maxPolarAngle = Math.PI; 
+      controls.minDistance = 50;
+      controls.maxDistance = 650;
 
-      const mainLight = new THREE.DirectionalLight(0xffffff, 0.85);
-      mainLight.position.set(160, 240, 180);
-      scene.add(mainLight);
-
-      const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
-      fillLight.position.set(-160, -80, -160);
-      scene.add(fillLight);
-
-      // 底面網格
-      const grid = new THREE.GridHelper(300, 30, 0x38bdf8, 0x1e293b);
-      grid.position.y = -0.1;
-      scene.add(grid);
-
-      // 材質
-      bodyMaterial = new THREE.MeshStandardMaterial({
-        color: 0xef4444,
-        metalness: 0.5,
-        roughness: 0.25
-      });
-
-      chassisMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1e293b,
-        metalness: 0.2,
-        roughness: 0.7
-      });
-
-      tireMaterial = new THREE.MeshStandardMaterial({
-        color: 0x111827,
-        metalness: 0.1,
-        roughness: 0.8
-      });
-
-      rimMaterial = new THREE.MeshStandardMaterial({
-        color: 0xe2e8f0,
-        metalness: 0.8,
-        roughness: 0.2
-      });
-
-      buildCarModel();
+      setupLighting();
+      setupMaterials();
+      buildFullCyberHypercar();
+      setupEnvironment();
+      setupWindTunnel();
 
       window.addEventListener('resize', onWindowResize);
       animate();
     }
 
-    function buildCarModel() {
+    function setupLighting() {
+      // 環境光
+      const ambient = new THREE.AmbientLight(0x25354e, 1.4);
+      scene.add(ambient);
+
+      // 上方頂部主高光
+      const mainSpot = new THREE.DirectionalLight(0xffffff, 1.5);
+      mainSpot.position.set(120, 260, 100);
+      mainSpot.castShadow = true;
+      mainSpot.shadow.bias = -0.0004;
+      scene.add(mainSpot);
+
+      // 前方補光
+      const frontFill = new THREE.DirectionalLight(0xffffff, 0.9);
+      frontFill.position.set(200, 30, 0);
+      scene.add(frontFill);
+
+      // ★ 底盤專用仰視補光 (由下往上照亮底盤與電池) ★
+      const underFloorLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
+      underFloorLight.position.set(0, -150, 0);
+      scene.add(underFloorLight);
+
+      // 側翼冷暖邊緣光
+      const rimCyan = new THREE.DirectionalLight(0x00f0ff, 1.1);
+      rimCyan.position.set(-180, 90, -180);
+      scene.add(rimCyan);
+
+      const rimPurple = new THREE.DirectionalLight(0xa855f7, 0.9);
+      rimPurple.position.set(180, 60, -160);
+      scene.add(rimPurple);
+
+      // 車底霓虹地表點光源
+      underglowLight = new THREE.PointLight(0x00f0ff, 3.5, 130);
+      underglowLight.position.set(0, 2.5, 0);
+      scene.add(underglowLight);
+    }
+
+    function setupMaterials() {
+      bodyMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        metalness: 0.85,
+        roughness: 0.18,
+      });
+
+      carbonMat = new THREE.MeshStandardMaterial({
+        color: 0x111520,
+        metalness: 0.45,
+        roughness: 0.35,
+      });
+
+      glassMat = new THREE.MeshStandardMaterial({
+        color: 0x050914,
+        metalness: 0.96,
+        roughness: 0.05,
+        transparent: true,
+        opacity: 0.82,
+      });
+
+      ledHeadlightMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        emissive: 0x00f0ff,
+        emissiveIntensity: 2.0,
+        roughness: 0.1,
+      });
+
+      ledTaillightMat = new THREE.MeshStandardMaterial({
+        color: 0xff0044,
+        emissive: 0xff0044,
+        emissiveIntensity: 2.2,
+        roughness: 0.1,
+      });
+
+      rimMat = new THREE.MeshStandardMaterial({
+        color: 0xe0e8f5,
+        metalness: 0.92,
+        roughness: 0.15,
+      });
+
+      tireMat = new THREE.MeshStandardMaterial({
+        color: 0x090c12,
+        metalness: 0.08,
+        roughness: 0.88,
+      });
+
+      brakeDiscMat = new THREE.MeshStandardMaterial({
+        color: 0x93a3b5,
+        metalness: 0.94,
+        roughness: 0.2,
+      });
+
+      brakeCaliperMat = new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        metalness: 0.75,
+        roughness: 0.25,
+        emissive: 0x00f0ff,
+        emissiveIntensity: 0.4,
+      });
+
+      chassisMat = new THREE.MeshStandardMaterial({
+        color: 0x151c28,
+        metalness: 0.5,
+        roughness: 0.5,
+      });
+
+      batteryMat = new THREE.MeshStandardMaterial({
+        color: 0x00ff88,
+        metalness: 0.8,
+        roughness: 0.25,
+      });
+    }
+
+    // =======================================================
+    // 建立 100% 緊密結合且可完全檢視底盤的賽博超跑
+    // =======================================================
+    function buildFullCyberHypercar() {
       carGroup = new THREE.Group();
       scene.add(carGroup);
 
-      // 1. 底盤 (Chassis)
+      // =======================================================
+      // 1. 豐富細緻的工程底盤 (Underbody Chassis - 仰視可完整看見)
+      // =======================================================
       chassisGroup = new THREE.Group();
-      
-      const plateGeo = new THREE.BoxGeometry(140, 4, 60);
-      const plateMesh = new THREE.Mesh(plateGeo, chassisMaterial);
-      plateMesh.position.y = 8;
-      chassisGroup.add(plateMesh);
 
-      // 18650 電池槽
-      const batWallGeo = new THREE.BoxGeometry(72, 8, 22);
-      const batWallMesh = new THREE.Mesh(batWallGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 }));
-      batWallMesh.position.set(0, 12, 0);
-      chassisGroup.add(batWallMesh);
+      // (A) 平整化空氣力學碳纖底板 (Flat Aero Floor with Venturi Tunnels)
+      const floorShape = new THREE.Shape();
+      floorShape.moveTo(70, 28);
+      floorShape.quadraticCurveTo(76, 14, 76, 0);
+      floorShape.quadraticCurveTo(76, -14, 70, -28);
+      floorShape.lineTo(-68, -30);
+      floorShape.quadraticCurveTo(-75, 0, -68, 30);
+      floorShape.closePath();
 
-      // 18650 電池芯
-      const batCylGeo = new THREE.CylinderGeometry(8.5, 8.5, 65, 16);
-      const batMat = new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.6, roughness: 0.3 });
-      const batMesh = new THREE.Mesh(batCylGeo, batMat);
-      batMesh.rotation.z = Math.PI / 2;
-      batMesh.position.set(0, 12, 0);
-      chassisGroup.add(batMesh);
+      const floorGeo = new THREE.ExtrudeGeometry(floorShape, {
+        depth: 3.2,
+        bevelEnabled: true,
+        bevelSegments: 4,
+        bevelSize: 1.2,
+        bevelThickness: 1.2
+      });
+      floorGeo.rotateX(Math.PI / 2);
+      const floorMesh = new THREE.Mesh(floorGeo, carbonMat);
+      floorMesh.position.y = 7;
+      floorMesh.castShadow = true;
+      floorMesh.receiveShadow = true;
+      chassisGroup.add(floorMesh);
 
-      // 前後軸承安裝座
+      // (B) 底盤中央 18650 動力電池保護艙 (底面透出綠色金屬鋰電池芯)
+      const batPackGeo = new THREE.BoxGeometry(72, 6, 24);
+      const batPackMesh = new THREE.Mesh(batPackGeo, new THREE.MeshStandardMaterial({ color: 0x0a101d, metalness: 0.7, roughness: 0.4 }));
+      batPackMesh.position.set(0, 8.5, 0);
+      chassisGroup.add(batPackMesh);
+
+      // 電池底面散熱隔柵 (Cooling Ribs - 仰視清晰可見)
+      for (let r = -30; r <= 30; r += 10) {
+        const ribGeo = new THREE.BoxGeometry(4, 2, 22);
+        const ribMesh = new THREE.Mesh(ribGeo, batteryMat);
+        ribMesh.position.set(r, 5.5, 0);
+        chassisGroup.add(ribMesh);
+      }
+
+      // (C) 前軸與後軸雙電機馬達與傳動差速器總成 (Front/Rear Dual Motors - 完全隱藏於底盤下方 Y=4.5)
       for (let ax of [48, -48]) {
-        for (let az of [26, -26]) {
-          const mountGeo = new THREE.BoxGeometry(12, 10, 8);
-          const mountMesh = new THREE.Mesh(mountGeo, chassisMaterial);
-          mountMesh.position.set(ax, 11, az);
-          chassisGroup.add(mountMesh);
+        // 馬達圓柱殼體 (橫向沿 X 軸，安裝於底板下方)
+        const motorGeo = new THREE.CylinderGeometry(4.2, 4.2, 22, 16);
+        motorGeo.rotateZ(Math.PI / 2);
+        const motorMesh = new THREE.Mesh(motorGeo, new THREE.MeshStandardMaterial({ color: 0x222e44, metalness: 0.85, roughness: 0.3 }));
+        motorMesh.position.set(ax, 4.5, 0);
+        chassisGroup.add(motorMesh);
+
+        // 左右傳動半軸 (★ 必須沿 X 軸旋轉 90 度轉為 Z 軸水平連桿，絕不向上突起！★)
+        const axleGeo = new THREE.CylinderGeometry(1.5, 1.5, 66, 14);
+        axleGeo.rotateX(Math.PI / 2);
+        const axleMesh = new THREE.Mesh(axleGeo, new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 }));
+        axleMesh.position.set(ax, 4.5, 0);
+        chassisGroup.add(axleMesh);
+
+        // 前後懸吊 A 臂 (位於底盤底面 Y=4.5)
+        for (let side of [1, -1]) {
+          const armGeo = new THREE.BoxGeometry(8, 1.6, 12);
+          const armMesh = new THREE.Mesh(armGeo, carbonMat);
+          armMesh.position.set(ax, 4.5, side * 22);
+          armMesh.rotation.y = side * 0.15;
+          chassisGroup.add(armMesh);
         }
       }
+
       carGroup.add(chassisGroup);
 
-      // 2. 車身外殼 (Car Body)
+      // =======================================================
+      // 2. 空力套件組 (Aero Kit: Front Splitter, Diffuser, Skirts)
+      // =======================================================
+      aeroGroup = new THREE.Group();
+
+      // (A) 前碳纖流線彎刀下巴 (Curved Front Splitter)
+      const splitterShape = new THREE.Shape();
+      splitterShape.moveTo(82, 0);
+      splitterShape.quadraticCurveTo(79, 25, 70, 39);
+      splitterShape.quadraticCurveTo(65, 41, 62, 38);
+      splitterShape.quadraticCurveTo(72, 22, 75, 0);
+      splitterShape.quadraticCurveTo(72, -22, 62, -38);
+      splitterShape.quadraticCurveTo(65, -41, 70, -39);
+      splitterShape.quadraticCurveTo(79, -25, 82, 0);
+
+      const splitterGeo = new THREE.ExtrudeGeometry(splitterShape, {
+        depth: 2.2,
+        bevelEnabled: true,
+        bevelSegments: 5,
+        bevelSize: 1.0,
+        bevelThickness: 1.0
+      });
+      splitterGeo.rotateX(Math.PI / 2);
+      const splitterMesh = new THREE.Mesh(splitterGeo, carbonMat);
+      splitterMesh.position.y = 5.5;
+      splitterMesh.castShadow = true;
+      aeroGroup.add(splitterMesh);
+
+      // 前唇發光霓虹線
+      const splitterGlowShape = new THREE.Shape();
+      splitterGlowShape.moveTo(83, 0);
+      splitterGlowShape.quadraticCurveTo(80, 26, 71, 40);
+      splitterGlowShape.lineTo(70, 39);
+      splitterGlowShape.quadraticCurveTo(79, 25, 82, 0);
+      splitterGlowShape.quadraticCurveTo(79, -25, 70, -39);
+      splitterGlowShape.lineTo(71, -40);
+      splitterGlowShape.quadraticCurveTo(80, -26, 83, 0);
+
+      const splitterGlowGeo = new THREE.ExtrudeGeometry(splitterGlowShape, { depth: 1.8, bevelEnabled: false });
+      splitterGlowGeo.rotateX(Math.PI / 2);
+      const splitterGlowMesh = new THREE.Mesh(splitterGlowGeo, ledHeadlightMat);
+      splitterGlowMesh.position.y = 5.7;
+      aeroGroup.add(splitterGlowMesh);
+
+      // (B) 兩側前空力風刀 (Canards)
+      for (let side of [1, -1]) {
+        const canardShape = new THREE.Shape();
+        canardShape.moveTo(0, 0);
+        canardShape.quadraticCurveTo(6, 4, 14, 2);
+        canardShape.lineTo(12, 0);
+        canardShape.closePath();
+
+        const canardGeo = new THREE.ExtrudeGeometry(canardShape, { depth: 1.5, bevelEnabled: true, bevelSegments: 3, bevelSize: 0.5, bevelThickness: 0.5 });
+        const canardMesh = new THREE.Mesh(canardGeo, carbonMat);
+        canardMesh.position.set(65, 11.5, side * 36);
+        canardMesh.rotation.y = side * 0.35;
+        canardMesh.rotation.z = -0.15;
+        if (side === -1) canardMesh.scale.z = -1;
+        aeroGroup.add(canardMesh);
+      }
+
+      // (C) 流線側裙 (Aero Side Skirts)
+      for (let side of [1, -1]) {
+        const skirtShape = new THREE.Shape();
+        skirtShape.moveTo(35, 0);
+        skirtShape.quadraticCurveTo(0, -3, -35, 0);
+        skirtShape.lineTo(-35, 4);
+        skirtShape.quadraticCurveTo(0, 2, 35, 4);
+        skirtShape.closePath();
+
+        const skirtGeo = new THREE.ExtrudeGeometry(skirtShape, { depth: 1.8, bevelEnabled: true, bevelSegments: 4, bevelSize: 0.8, bevelThickness: 0.8 });
+        skirtGeo.rotateX(Math.PI / 2);
+        const skirtMesh = new THREE.Mesh(skirtGeo, carbonMat);
+        skirtMesh.position.set(0, 5.8, side * 34.5);
+        if (side === -1) skirtMesh.scale.z = -1;
+        aeroGroup.add(skirtMesh);
+
+        // 側裙發光光條
+        const skirtNeonGeo = new THREE.CylinderGeometry(0.6, 0.6, 68, 12);
+        skirtNeonGeo.rotateZ(Math.PI / 2);
+        const skirtNeon = new THREE.Mesh(skirtNeonGeo, ledHeadlightMat);
+        skirtNeon.position.set(0, 6.2, side * 37.8);
+        aeroGroup.add(skirtNeon);
+      }
+
+      // (D) 賽道級後下擴散器 (Curved Rear Diffuser & Strakes)
+      const diffShape = new THREE.Shape();
+      diffShape.moveTo(-55, 28);
+      diffShape.quadraticCurveTo(-65, 30, -78, 25);
+      diffShape.quadraticCurveTo(-82, 0, -78, -25);
+      diffShape.quadraticCurveTo(-65, -30, -55, -28);
+      diffShape.closePath();
+
+      const diffGeo = new THREE.ExtrudeGeometry(diffShape, { depth: 2.5, bevelEnabled: true, bevelSegments: 4, bevelSize: 1, bevelThickness: 1 });
+      diffGeo.rotateX(Math.PI / 2);
+      const diffMesh = new THREE.Mesh(diffGeo, carbonMat);
+      diffMesh.position.set(0, 7.5, 0);
+      diffMesh.rotation.z = -0.12;
+      aeroGroup.add(diffMesh);
+
+      // 4 道垂直導流鰭片
+      for (let zOffset of [-18, -6, 6, 18]) {
+        const finShape = new THREE.Shape();
+        finShape.moveTo(-58, 0);
+        finShape.quadraticCurveTo(-70, 2, -80, 8);
+        finShape.lineTo(-78, 0);
+        finShape.closePath();
+        const finGeo = new THREE.ExtrudeGeometry(finShape, { depth: 1.4, bevelEnabled: false });
+        const finMesh = new THREE.Mesh(finGeo, carbonMat);
+        finMesh.position.set(0, 5, zOffset);
+        aeroGroup.add(finMesh);
+      }
+
+      // F1 領航煞車警示燈
+      const f1LightGeo = new THREE.BoxGeometry(2, 3, 6);
+      const f1LightMesh = new THREE.Mesh(f1LightGeo, ledTaillightMat);
+      f1LightMesh.position.set(-79, 8.5, 0);
+      aeroGroup.add(f1LightMesh);
+
+      carGroup.add(aeroGroup);
+
+      // =======================================================
+      // 3. 一體化超跑流線車身 (Unified Streamlined Body & Wing)
+      // =======================================================
       bodyGroup = new THREE.Group();
 
-      const lowerGeo = new THREE.BoxGeometry(150, 14, 66);
-      const lowerMesh = new THREE.Mesh(lowerGeo, bodyMaterial);
-      lowerMesh.position.set(0, 17, 0);
-      bodyGroup.add(lowerMesh);
+      // (A) 前輪拱立體豐滿曲面 (Front Fenders)
+      for (let side of [1, -1]) {
+        const fenderShape = new THREE.Shape();
+        fenderShape.moveTo(72, 8);
+        fenderShape.quadraticCurveTo(62, 19, 48, 19.5);
+        fenderShape.quadraticCurveTo(34, 19, 22, 14);
+        fenderShape.quadraticCurveTo(32, 10, 36, 6);
+        fenderShape.quadraticCurveTo(48, 14, 60, 6);
+        fenderShape.closePath();
 
-      // 駕駛座艙頂蓋
-      const cabinGeo = new THREE.BoxGeometry(70, 16, 50);
-      const cabinMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.1 });
-      const cabinMesh = new THREE.Mesh(cabinGeo, cabinMat);
-      cabinMesh.position.set(-6, 29, 0);
-      bodyGroup.add(cabinMesh);
+        const fenderGeo = new THREE.ExtrudeGeometry(fenderShape, {
+          depth: 13,
+          bevelEnabled: true,
+          bevelSegments: 8,
+          bevelSize: 3.0,
+          bevelThickness: 3.0
+        });
+        fenderGeo.computeVertexNormals();
+        const fenderMesh = new THREE.Mesh(fenderGeo, bodyMat);
+        fenderMesh.position.set(0, 0, side === 1 ? 23 : -36);
+        fenderMesh.castShadow = true;
+        bodyGroup.add(fenderMesh);
 
-      // 擋風玻璃斜面
-      const slopeGeo = new THREE.BoxGeometry(32, 4, 48);
-      const slopeMesh = new THREE.Mesh(slopeGeo, cabinMat);
-      slopeMesh.rotation.z = Math.PI / 5;
-      slopeMesh.position.set(24, 27, 0);
-      bodyGroup.add(slopeMesh);
+        // 前迴力鏢光刃 LED
+        const lightCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(71, 9, side * 30),
+          new THREE.Vector3(64, 15, side * 33),
+          new THREE.Vector3(50, 18, side * 34),
+          new THREE.Vector3(40, 16, side * 33)
+        ]);
+        const lightGeo = new THREE.TubeGeometry(lightCurve, 20, 1.2, 8, false);
+        const lightMesh = new THREE.Mesh(lightGeo, ledHeadlightMat);
+        bodyGroup.add(lightMesh);
+      }
 
-      // 引擎蓋斜切
-      const hoodGeo = new THREE.BoxGeometry(45, 6, 62);
-      const hoodMesh = new THREE.Mesh(hoodGeo, bodyMaterial);
-      hoodMesh.rotation.z = -Math.PI / 14;
-      hoodMesh.position.set(50, 21, 0);
+      // (B) 引擎蓋中央下凹 S-Duct 風道與前鼻錐
+      const hoodShape = new THREE.Shape();
+      hoodShape.moveTo(76, 7);
+      hoodShape.quadraticCurveTo(55, 14, 20, 15.5);
+      hoodShape.lineTo(20, 10);
+      hoodShape.quadraticCurveTo(55, 9, 76, 5);
+      hoodShape.closePath();
+
+      const hoodGeo = new THREE.ExtrudeGeometry(hoodShape, {
+        depth: 26,
+        bevelEnabled: true,
+        bevelSegments: 7,
+        bevelSize: 2.2,
+        bevelThickness: 2.2
+      });
+      hoodGeo.computeVertexNormals();
+      const hoodMesh = new THREE.Mesh(hoodGeo, bodyMat);
+      hoodMesh.position.set(0, 0, -13);
+      hoodMesh.castShadow = true;
       bodyGroup.add(hoodMesh);
 
-      // 貫穿式前大燈 LED
-      const lightGeo = new THREE.BoxGeometry(4, 3, 50);
-      const lightMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.8 });
-      const lightMesh = new THREE.Mesh(lightGeo, lightMat);
-      lightMesh.position.set(75, 17, 0);
-      bodyGroup.add(lightMesh);
+      // 引擎蓋 S-Duct 黑色導風孔
+      const sDuctGeo = new THREE.CylinderGeometry(8, 10, 20, 16, 1, false, 0, Math.PI);
+      sDuctGeo.rotateZ(Math.PI / 2);
+      sDuctGeo.rotateY(Math.PI / 2);
+      const sDuctMesh = new THREE.Mesh(sDuctGeo, carbonMat);
+      sDuctMesh.position.set(48, 14.5, 0);
+      sDuctMesh.scale.set(1.4, 0.4, 1.0);
+      bodyGroup.add(sDuctMesh);
 
-      // 尾翼 (Spoiler)
-      const wingGeo = new THREE.BoxGeometry(12, 3, 62);
-      const wingMesh = new THREE.Mesh(wingGeo, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 }));
-      wingMesh.position.set(-70, 27, 0);
+      // (C) 戰鬥機雙曲面水滴座艙 (Jet Canopy)
+      const sphereGeo = new THREE.SphereGeometry(18, 36, 24);
+      const pos = sphereGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        let x = pos.getX(i);
+        let y = pos.getY(i);
+        let z = pos.getZ(i);
+
+        if (y < -2) y = -2;
+        let taper = x < 0 ? 1.0 + (x / 30) * 0.48 : 1.0 - (x / 26) * 0.18;
+        if (taper < 0.22) taper = 0.22;
+        z *= taper;
+        x *= 1.8;
+        y *= 0.76;
+        z *= 1.25;
+        pos.setXYZ(i, x, y, z);
+      }
+      sphereGeo.computeVertexNormals();
+
+      const canopyMesh = new THREE.Mesh(sphereGeo, glassMat);
+      canopyMesh.position.set(-6, 17.5, 0);
+      canopyMesh.castShadow = true;
+      bodyGroup.add(canopyMesh);
+
+
+      // (E) 車側收腰進氣通道 (Side Pods)
+      for (let side of [1, -1]) {
+        const podShape = new THREE.Shape();
+        podShape.moveTo(22, 14);
+        podShape.quadraticCurveTo(0, 12, -22, 14);
+        podShape.quadraticCurveTo(0, 6, 22, 6);
+        podShape.closePath();
+
+        const podGeo = new THREE.ExtrudeGeometry(podShape, {
+          depth: 10,
+          bevelEnabled: true,
+          bevelSegments: 6,
+          bevelSize: 2.0,
+          bevelThickness: 2.0
+        });
+        podGeo.computeVertexNormals();
+        const podMesh = new THREE.Mesh(podGeo, bodyMat);
+        podMesh.position.set(0, 0, side === 1 ? 16 : -26);
+        podMesh.castShadow = true;
+        bodyGroup.add(podMesh);
+      }
+
+      // (F) 後輪拱寬體外擴肌肉曲面 (Rear Muscular Haunches)
+      for (let side of [1, -1]) {
+        const rearFenderShape = new THREE.Shape();
+        rearFenderShape.moveTo(-20, 13);
+        rearFenderShape.quadraticCurveTo(-46, 21, -74, 15);
+        rearFenderShape.quadraticCurveTo(-72, 7, -62, 6);
+        rearFenderShape.quadraticCurveTo(-48, 14, -36, 6);
+        rearFenderShape.quadraticCurveTo(-26, 7, -20, 13);
+        rearFenderShape.closePath();
+
+        const rearFenderGeo = new THREE.ExtrudeGeometry(rearFenderShape, {
+          depth: 15,
+          bevelEnabled: true,
+          bevelSegments: 8,
+          bevelSize: 3.0,
+          bevelThickness: 3.0
+        });
+        rearFenderGeo.computeVertexNormals();
+        const rearFenderMesh = new THREE.Mesh(rearFenderGeo, bodyMat);
+        rearFenderMesh.position.set(0, 0, side === 1 ? 23 : -38);
+        rearFenderMesh.castShadow = true;
+        bodyGroup.add(rearFenderMesh);
+      }
+
+      // ★ (G) 後引擎艙蓋與中央流暢封閉甲板 (Rear Engine Deck - 讓後方緊密完整封閉) ★
+      const deckShape = new THREE.Shape();
+      deckShape.moveTo(-18, 15);
+      deckShape.quadraticCurveTo(-44, 17.5, -72, 14.5);
+      deckShape.lineTo(-72, 7.5);
+      deckShape.quadraticCurveTo(-44, 7.5, -18, 7.5);
+      deckShape.closePath();
+
+      const deckGeo = new THREE.ExtrudeGeometry(deckShape, {
+        depth: 28,
+        bevelEnabled: true,
+        bevelSegments: 5,
+        bevelSize: 1.8,
+        bevelThickness: 1.8
+      });
+      deckGeo.computeVertexNormals();
+      const deckMesh = new THREE.Mesh(deckGeo, bodyMat);
+      deckMesh.position.set(0, 0, -14);
+      deckMesh.castShadow = true;
+      bodyGroup.add(deckMesh);
+
+      // 中央流暢鯊魚鰭空力背脊 (Aero Dorsal Spine)
+      const spineShape = new THREE.Shape();
+      spineShape.moveTo(-20, 17);
+      spineShape.quadraticCurveTo(-40, 23, -64, 18);
+      spineShape.lineTo(-62, 15);
+      spineShape.quadraticCurveTo(-40, 16, -20, 15);
+      spineShape.closePath();
+      const spineGeo = new THREE.ExtrudeGeometry(spineShape, { depth: 1.6, bevelEnabled: true, bevelSegments: 2, bevelSize: 0.4, bevelThickness: 0.4 });
+      const spineMesh = new THREE.Mesh(spineGeo, carbonMat);
+      spineMesh.position.set(0, 0, -0.8);
+      bodyGroup.add(spineMesh);
+
+      // 車尾 3D 刀鋒連貫 OLED 尾燈 (緊貼後甲板邊緣)
+      const tailMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(3.5, 2.5, 68),
+        ledTaillightMat
+      );
+      tailMesh.position.set(-71, 14.5, 0);
+      bodyGroup.add(tailMesh);
+
+      // ★ (H) 天鵝頸主動式雙曲面尾翼 (牢固安裝於後甲板上方，絕不分離) ★
+      // 1. 雙天鵝頸懸臂支柱 (Swan-Neck Pylons)
+      for (let side of [1, -1]) {
+        const pylonShape = new THREE.Shape();
+        pylonShape.moveTo(-54, 15.5);
+        pylonShape.quadraticCurveTo(-60, 24, -68, 28.5);
+        pylonShape.lineTo(-72, 28.5);
+        pylonShape.quadraticCurveTo(-66, 21, -60, 15.5);
+        pylonShape.closePath();
+
+        const pylonGeo = new THREE.ExtrudeGeometry(pylonShape, {
+          depth: 2.2,
+          bevelEnabled: true,
+          bevelSegments: 3,
+          bevelSize: 0.5,
+          bevelThickness: 0.5
+        });
+        const pylonMesh = new THREE.Mesh(pylonGeo, carbonMat);
+        pylonMesh.position.set(0, 0, side * 18 - 1.1);
+        bodyGroup.add(pylonMesh);
+      }
+
+      // 2. 主翼板 (完整落在兩支柱頂端 X=-68, Y=29)
+      const wingAirfoil = new THREE.Shape();
+      wingAirfoil.moveTo(7, 0);
+      wingAirfoil.quadraticCurveTo(0, 2.0, -10, 1.4);
+      wingAirfoil.quadraticCurveTo(-14, 0.6, -15, 0);
+      wingAirfoil.quadraticCurveTo(-10, -0.6, 0, -1.0);
+      wingAirfoil.quadraticCurveTo(4, -0.8, 7, 0);
+
+      const wingGeo = new THREE.ExtrudeGeometry(wingAirfoil, {
+        depth: 76,
+        bevelEnabled: true,
+        bevelSegments: 4,
+        bevelSize: 0.8,
+        bevelThickness: 0.8
+      });
+      const wingMesh = new THREE.Mesh(wingGeo, carbonMat);
+      wingMesh.position.set(-66, 29, -38);
+      wingMesh.rotation.z = -0.06;
+      wingMesh.castShadow = true;
       bodyGroup.add(wingMesh);
+
+      // 3. 尾翼兩側垂直端板 (Endplates)
+      for (let side of [1, -1]) {
+        const endShape = new THREE.Shape();
+        endShape.moveTo(-56, 25);
+        endShape.quadraticCurveTo(-66, 34, -77, 31);
+        endShape.lineTo(-72, 25);
+        endShape.closePath();
+
+        const endGeo = new THREE.ExtrudeGeometry(endShape, { depth: 1.5, bevelEnabled: true, bevelSegments: 2, bevelSize: 0.4, bevelThickness: 0.4 });
+        const endMesh = new THREE.Mesh(endGeo, carbonMat);
+        endMesh.position.set(0, 0, side * 38 - 0.75);
+        bodyGroup.add(endMesh);
+
+        // 垂直光條
+        const endLight = new THREE.Mesh(new THREE.BoxGeometry(14, 1.2, 0.6), ledTaillightMat);
+        endLight.position.set(-67, 29, side * 39);
+        endLight.rotation.z = -0.25;
+        bodyGroup.add(endLight);
+      }
 
       carGroup.add(bodyGroup);
 
-      // 3. 4 顆運動車輪 (Wheels)
-      const wheelPositions = [
+      // =======================================================
+      // 4. 4 組渦輪扇葉刀鋒輪圈與通風煞車系統 (Wheels & Brakes)
+      // =======================================================
+      const wheelSpecs = [
         { x: 48, z: 38, isLeft: true },
         { x: 48, z: -38, isLeft: false },
         { x: -48, z: 38, isLeft: true },
@@ -486,74 +1160,225 @@
       ];
 
       wheelsGroup = [];
-      for (let pos of wheelPositions) {
-        const singleWheel = new THREE.Group();
-        singleWheel.userData = { origX: pos.x, origZ: pos.z, isLeft: pos.isLeft };
 
-        const tireGeo = new THREE.CylinderGeometry(17, 17, 13, 24);
-        const tireMesh = new THREE.Mesh(tireGeo, tireMaterial);
+      for (let spec of wheelSpecs) {
+        const wheelAssembly = new THREE.Group();
+        wheelAssembly.userData = { origX: spec.x, origZ: spec.z, isLeft: spec.isLeft };
+
+        const wheelRotator = new THREE.Group();
+
+        // 胎面圓柱 (圓弧胎壁)
+        const tireGeo = new THREE.CylinderGeometry(17, 17, 13.5, 32);
+        const tireMesh = new THREE.Mesh(tireGeo, tireMat);
         tireMesh.rotation.x = Math.PI / 2;
-        singleWheel.add(tireMesh);
+        tireMesh.castShadow = true;
+        wheelRotator.add(tireMesh);
 
-        const rimGeo = new THREE.CylinderGeometry(11, 11, 13.5, 16);
-        const rimMesh = new THREE.Mesh(rimGeo, rimMaterial);
+        // 輪框本體 (金屬亮銀)
+        const rimGeo = new THREE.CylinderGeometry(13, 13, 14, 24);
+        const rimMesh = new THREE.Mesh(rimGeo, rimMat);
         rimMesh.rotation.x = Math.PI / 2;
-        singleWheel.add(rimMesh);
+        wheelRotator.add(rimMesh);
 
-        const hubGeo = new THREE.CylinderGeometry(4, 4, 14, 12);
-        const hubMesh = new THREE.Mesh(hubGeo, new THREE.MeshStandardMaterial({ color: 0x090d16 }));
+        // 渦輪導風扇葉 (8 片斜切刀鋒)
+        for (let b = 0; b < 8; b++) {
+          const bladeGeo = new THREE.BoxGeometry(1.8, 6, 14.2);
+          const blade = new THREE.Mesh(bladeGeo, carbonMat);
+          const bAngle = b * (Math.PI / 4);
+          blade.position.set(Math.cos(bAngle) * 7.5, Math.sin(bAngle) * 7.5, 0);
+          blade.rotation.z = bAngle + 0.5;
+          wheelRotator.add(blade);
+        }
+
+        // 中心鎖止機構 (Center Lock Hub)
+        const hubGeo = new THREE.CylinderGeometry(3.6, 3.6, 14.8, 16);
+        const hubMesh = new THREE.Mesh(hubGeo, ledHeadlightMat);
         hubMesh.rotation.x = Math.PI / 2;
-        singleWheel.add(hubMesh);
+        wheelRotator.add(hubMesh);
 
-        singleWheel.position.set(pos.x, 17, pos.z);
-        carGroup.add(singleWheel);
-        wheelsGroup.push(singleWheel);
+        wheelAssembly.add(wheelRotator);
+        wheelAssembly.userData.rotator = wheelRotator;
+
+        // 煞車總成 (不隨輪圈旋轉)
+        const brakeGroup = new THREE.Group();
+
+        const discGeo = new THREE.CylinderGeometry(10, 10, 1.4, 24);
+        const discMesh = new THREE.Mesh(discGeo, brakeDiscMat);
+        discMesh.rotation.x = Math.PI / 2;
+        discMesh.position.z = spec.isLeft ? -1.8 : 1.8;
+        brakeGroup.add(discMesh);
+
+        const caliperGeo = new THREE.BoxGeometry(4.8, 7.5, 3.2);
+        const caliperMesh = new THREE.Mesh(caliperGeo, brakeCaliperMat);
+        caliperMesh.position.set(0, 7.5, spec.isLeft ? -1.8 : 1.8);
+        brakeGroup.add(caliperMesh);
+
+        wheelAssembly.add(brakeGroup);
+
+        wheelAssembly.position.set(spec.x, 16.5, spec.z);
+        carGroup.add(wheelAssembly);
+        wheelsGroup.push(wheelAssembly);
       }
     }
 
+    function setupEnvironment() {
+      // 賽博地面半透明金屬網格 (Cyber Grid - 從下方仰視可完全穿透)
+      groundGrid = new THREE.GridHelper(400, 40, 0x00f0ff, 0x141c2c);
+      groundGrid.position.y = -0.05;
+      scene.add(groundGrid);
+    }
+
+    function setupWindTunnel() {
+      const particleCount = 280;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const speeds = new Float32Array(particleCount);
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = 130 + Math.random() * 90;
+        positions[i * 3 + 1] = 6 + Math.random() * 36;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 80;
+        speeds[i] = 2.0 + Math.random() * 1.6;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+      const pMaterial = new THREE.PointsMaterial({
+        color: 0x00f0ff,
+        size: 2.2,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+      });
+
+      windParticles = new THREE.Points(geometry, pMaterial);
+      windParticles.userData.speeds = speeds;
+      windParticles.visible = false;
+      scene.add(windParticles);
+    }
+
+    // ==========================================
+    // 互動控制邏輯
+    // ==========================================
+
+    // 💥 3D 爆炸分解圖展開
     function onExplodeChange(val) {
-      const progress = val / 100;
+      const p = val / 100;
       document.getElementById('explode-val').innerText = val + '%';
 
-      bodyGroup.position.y = progress * 48;
-
-      for (let w of wheelsGroup) {
-        const offset = (w.userData.isLeft ? 1 : -1) * progress * 35;
-        w.position.z = w.userData.origZ + offset;
+      if (bodyGroup) {
+        bodyGroup.position.y = p * 54;
       }
-
-      chassisGroup.position.y = -progress * 15;
+      if (aeroGroup) {
+        aeroGroup.position.y = -p * 18;
+      }
+      if (wheelsGroup && wheelsGroup.length > 0) {
+        for (let w of wheelsGroup) {
+          const offset = (w.userData.isLeft ? 1 : -1) * p * 38;
+          w.position.z = w.userData.origZ + offset;
+        }
+      }
+      if (chassisGroup) {
+        chassisGroup.position.y = -p * 26;
+      }
     }
 
-    function togglePart(part, visible) {
-      if (part === 'body') bodyGroup.visible = visible;
-      if (part === 'chassis') chassisGroup.visible = visible;
-      if (part === 'wheels') {
-        for (let w of wheelsGroup) w.visible = visible;
-      }
-    }
+    // 🎨 車漆選色
+    function setCarColor(hexMain, element) {
+      currentCarColor = hexMain;
+      bodyMat.color.setHex(hexMain);
 
-    function setBodyColor(hex, element) {
-      bodyMaterial.color.setHex(hex);
-      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      document.querySelectorAll('.color-card').forEach(c => c.classList.remove('active'));
       if (element) element.classList.add('active');
+
+      if (underglowEnabled) {
+        underglowLight.color.setHex(hexMain);
+        ledHeadlightMat.color.setHex(hexMain);
+        ledHeadlightMat.emissive.setHex(hexMain);
+      }
     }
 
-    function toggleAutoRotate() {
-      autoRotate = !autoRotate;
+    // 🌌 車底霓虹燈
+    function toggleUnderglow() {
+      underglowEnabled = !underglowEnabled;
+      const btn = document.getElementById('btnUnderglow');
+      if (underglowEnabled) {
+        btn.classList.add('active');
+        btn.querySelector('.toggle-sub').innerText = '地表氛圍光 ON';
+        underglowLight.intensity = 3.5;
+      } else {
+        btn.classList.remove('active');
+        btn.querySelector('.toggle-sub').innerText = '地表氛圍光 OFF';
+        underglowLight.intensity = 0;
+      }
     }
+
+    // ✨ 光刃星環燈
+    function toggleHeadlights() {
+      headlightsEnabled = !headlightsEnabled;
+      const btn = document.getElementById('btnHeadlights');
+      if (headlightsEnabled) {
+        btn.classList.add('active');
+        btn.querySelector('.toggle-sub').innerText = '曲面光帶 ON';
+        ledHeadlightMat.emissiveIntensity = 2.0;
+        ledTaillightMat.emissiveIntensity = 2.2;
+      } else {
+        btn.classList.remove('active');
+        btn.querySelector('.toggle-sub').innerText = '曲面光帶 OFF';
+        ledHeadlightMat.emissiveIntensity = 0.1;
+        ledTaillightMat.emissiveIntensity = 0.2;
+      }
+    }
+
+    // 💨 風洞模擬
+    function toggleWindTunnel() {
+      isWindTunnel = !isWindTunnel;
+      const btn = document.getElementById('btnWindTunnel');
+      if (isWindTunnel) {
+        btn.classList.add('active');
+        btn.querySelector('.toggle-sub').innerText = '空力模擬 ON';
+        windParticles.visible = true;
+      } else {
+        btn.classList.remove('active');
+        btn.querySelector('.toggle-sub').innerText = '空力模擬 OFF';
+        windParticles.visible = false;
+      }
+    }
+
+    // 🚀 巡航旋轉動態
+    function toggleDriveSim() {
+      isDriving = !isDriving;
+      const btn = document.getElementById('btnDriveSim');
+      if (isDriving) {
+        btn.classList.add('active');
+        btn.querySelector('.toggle-sub').innerText = '輪軸滾動 ON';
+      } else {
+        btn.classList.remove('active');
+        btn.querySelector('.toggle-sub').innerText = '輪軸滾動 OFF';
+      }
+    }
+
+    function toggleAutoRotate() { autoRotate = !autoRotate; }
 
     function resetCamera() {
-      camera.position.set(190, 150, 220);
+      camera.position.set(180, 110, 195);
       controls.target.set(0, 15, 0);
       controls.update();
     }
 
+    // 視角切換 (包含仰視底盤)
     function setView(view) {
-      if (view === 'top') {
-        camera.position.set(0, 280, 0);
+      if (view === 'underbody') {
+        // ★ 仰視底盤專用視角 (由下往上清晰觀察底板、電池、電機傳動軸) ★
+        camera.position.set(110, -85, 140);
+      } else if (view === 'front') {
+        camera.position.set(175, 30, 85);
+      } else if (view === 'top') {
+        camera.position.set(0, 260, 0);
       } else if (view === 'side') {
-        camera.position.set(0, 25, 260);
+        camera.position.set(0, 30, 220);
+      } else if (view === 'rear') {
+        camera.position.set(-185, 45, -75);
       }
       controls.target.set(0, 15, 0);
       controls.update();
@@ -568,9 +1393,37 @@
 
     function animate() {
       requestAnimationFrame(animate);
+
       if (autoRotate && carGroup) {
-        carGroup.rotation.y += 0.008;
+        carGroup.rotation.y += 0.007;
       }
+
+      if (isDriving && wheelsGroup.length > 0) {
+        for (let w of wheelsGroup) {
+          if (w.userData.rotator) {
+            w.userData.rotator.rotation.z -= 0.12;
+          }
+        }
+        groundGrid.position.x = (groundGrid.position.x - 1.2) % 10;
+      }
+
+      if (isWindTunnel && windParticles && windParticles.visible) {
+        const positions = windParticles.geometry.attributes.position.array;
+        const speeds = windParticles.userData.speeds;
+        for (let i = 0; i < speeds.length; i++) {
+          positions[i * 3] -= speeds[i] * 2.3;
+          if (positions[i * 3] < 50 && positions[i * 3] > -50 && positions[i * 3 + 1] < 36) {
+            positions[i * 3 + 1] += 0.35;
+          }
+          if (positions[i * 3] < -130) {
+            positions[i * 3] = 135 + Math.random() * 40;
+            positions[i * 3 + 1] = 6 + Math.random() * 32;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 80;
+          }
+        }
+        windParticles.geometry.attributes.position.needsUpdate = true;
+      }
+
       controls.update();
       renderer.render(scene, camera);
     }

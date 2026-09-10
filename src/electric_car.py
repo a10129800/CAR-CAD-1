@@ -1,12 +1,11 @@
 """
-電動汽車完整組裝體 (Electric Car Full Assembly)
-整合底盤、流線外殼及 4 個車輪模組，構成完整參數化 CAD 裝配體
-可單獨執行編譯，亦可匯出全車 STEP 與 3D 列印 STL/3MF
+未來科技感賽博電動超跑總裝配體 (Cyber EV Hypercar Full Assembly)
+整合高剛性平整底盤、未來賽博空氣力學外殼及 4 組渦輪刀鋒車輪總成
 """
 import sys
 from pathlib import Path
 
-# 將當前 src 加入搜尋路徑，方便相互引用
+# 將當前 src 加入搜尋路徑
 sys.path.insert(0, str(Path(__file__).parent))
 
 from cadgen import build123d as bd
@@ -25,20 +24,19 @@ def electric_car():
     body_part = car_body()
     wheel_model = wheel()
     
-    # 2. 定位底盤 (離地間隙 8mm)
-    chassis_placed = bd.Pos(0, 0, 8.0) * chassis_part
+    # 2. 定位底盤 (離地間隙 7.5mm)
+    chassis_placed = bd.Pos(0, 0, 7.5) * chassis_part
     
-    # 3. 定位流線車身 (蓋在底盤上方)
-    body_placed = bd.Pos(0, 0, 10.0) * body_part
+    # 3. 定位賽博車身 (精確蓋合於底盤)
+    body_placed = bd.Pos(0, 0, 9.5) * body_part
     
-    # 4. 定位 4 個車輪 (前/後軸距 ±48mm，左右輪距 ±39mm，車輪中心高 18mm)
-    # 車輪模型預設軸向為 Z 軸，旋轉 90 度轉為 Y 軸方向
-    wheel_fl = bd.Pos(48.0, 39.0, 16.0) * bd.Rot(90, 0, 0) * wheel_model
-    wheel_fr = bd.Pos(48.0, -39.0, 16.0) * bd.Rot(-90, 0, 0) * wheel_model
-    wheel_rl = bd.Pos(-48.0, 39.0, 16.0) * bd.Rot(90, 0, 0) * wheel_model
-    wheel_rr = bd.Pos(-48.0, -39.0, 16.0) * bd.Rot(-90, 0, 0) * wheel_model
+    # 4. 定位 4 個低風阻渦輪車輪 (前後軸距 ±48mm，左右輪距 ±39.5mm，車輪中心高 16.5mm)
+    wheel_fl = bd.Pos(48.0, 39.5, 16.5) * bd.Rot(90, 0, 0) * wheel_model
+    wheel_fr = bd.Pos(48.0, -39.5, 16.5) * bd.Rot(-90, 0, 0) * wheel_model
+    wheel_rl = bd.Pos(-48.0, 39.5, 16.5) * bd.Rot(90, 0, 0) * wheel_model
+    wheel_rr = bd.Pos(-48.0, -39.5, 16.5) * bd.Rot(-90, 0, 0) * wheel_model
     
-    # 5. 組合成完整複合裝配體 (Compound Assembly)
+    # 5. 組合成完整裝配體
     assembly = bd.Compound(
         children=[
             chassis_placed,
