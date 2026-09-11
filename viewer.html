@@ -114,6 +114,196 @@
       border-color: var(--primary);
       color: #fff;
     }
+
+    /* ================= CAD 工程三視圖 / 四分屏系統樣式 ================= */
+    #quadview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      z-index: 12;
+    }
+    #quadview-overlay.active {
+      display: grid;
+    }
+    .quad-pane {
+      position: relative;
+      border: 1px solid rgba(0, 240, 255, 0.22);
+      box-shadow: inset 0 0 35px rgba(0, 240, 255, 0.04);
+      pointer-events: none;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px 16px;
+    }
+    .quad-pane-tl { border-bottom-width: 1px; border-right-width: 1px; }
+    .quad-pane-tr { border-bottom-width: 1px; border-left: none; }
+    .quad-pane-bl { border-top: none; border-right-width: 1px; }
+    .quad-pane-br { border-top: none; border-left: none; }
+
+    .quad-header {
+      pointer-events: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(6, 10, 18, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 240, 255, 0.28);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.6);
+      width: fit-content;
+      max-width: 95%;
+      gap: 10px;
+    }
+    .quad-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quad-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .quad-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--primary);
+      border-radius: 4px;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    .quad-dim-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #94a3b8;
+    }
+    .quad-btn {
+      pointer-events: auto;
+      background: rgba(14, 22, 38, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #00f0ff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .quad-btn:hover {
+      background: rgba(0, 240, 255, 0.25);
+      color: #fff;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* CAD 尺寸標注線與文字標籤樣式 (純 HTML 渲染，保證高清晰、絕不拉伸變形) */
+    .cad-dim-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .cad-dim-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .dim-line {
+      stroke: rgba(0, 240, 255, 0.45);
+      stroke-width: 1;
+      stroke-dasharray: 4, 3;
+    }
+    .dim-solid {
+      stroke: rgba(0, 240, 255, 0.85);
+      stroke-width: 1.4;
+    }
+    .cad-dim-label {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #00f0ff;
+      background: rgba(6, 12, 22, 0.92);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+      letter-spacing: 0.5px;
+      z-index: 10;
+    }
+    .cad-dim-label.vert {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 1px;
+    }
+
+    .quad-center-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      background: rgba(8, 14, 24, 0.92);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #00f0ff;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 14;
+      transition: all 0.2s;
+    }
+    .quad-center-badge:hover {
+      background: rgba(0, 240, 255, 0.2);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    #single-ortho-banner {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(8, 14, 24, 0.92);
+      border: 1px solid var(--primary);
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 25;
+      box-shadow: 0 8px 30px rgba(0, 240, 255, 0.25);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+    #single-ortho-banner.active {
+      display: flex;
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -124,6 +314,140 @@
     <div id="badge">
       <h1>⚡ CYBER HYPERCAR 3D</h1>
       <p>360° 空間自由旋轉 (支援底盤仰視) | 滾輪縮放</p>
+    </div>
+
+    <!-- 單一正交視圖提示條 -->
+    <div id="single-ortho-banner">
+      <span style="color:#00f0ff;">📐 正在檢視：<strong id="ortho-title" style="color:#fff;">正俯視圖</strong> [正交 1:1]</span>
+      <button class="quad-btn" onclick="toggleMultiView('quad')">🔙 返回三視圖</button>
+      <button class="quad-btn" onclick="setSingleView('3d')">🏎️ 3D 視角</button>
+      <button class="quad-btn" style="border-color:#10b981; color:#10b981;" onclick="exportCADDrawing()">📸 匯出圖紙</button>
+    </div>
+
+    <!-- 📐 CAD 工程三視圖 / 四分屏 DOM 覆蓋層 -->
+    <div id="quadview-overlay">
+      <svg style="position:absolute; width:0; height:0;">
+        <defs>
+          <marker id="arr-cyan-start" markerWidth="6" markerHeight="6" refX="2" refY="3" orient="auto">
+            <polygon points="5 1, 1 3, 5 5" fill="#00f0ff" />
+          </marker>
+          <marker id="arr-cyan-end" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+            <polygon points="1 1, 5 3, 1 5" fill="#00f0ff" />
+          </marker>
+        </defs>
+      </svg>
+
+      <!-- 左上：俯視圖 (TOP VIEW) -->
+      <div class="quad-pane quad-pane-tl" id="pane-top">
+        <div class="quad-header">
+          <div class="quad-title-group">
+            <span class="quad-title">📐 俯視圖 · TOP VIEW</span>
+            <span class="quad-badge">正交 1:1</span>
+            <span class="quad-dim-tag">長 158mm × 寬 90mm</span>
+          </div>
+          <button class="quad-btn" onclick="setOrthographicView('top')" title="單獨全螢幕檢視俯視圖">⛶ 全螢幕</button>
+        </div>
+        <div class="cad-dim-overlay">
+          <svg class="cad-dim-svg">
+            <!-- 總長標注線 (橫向) -->
+            <line x1="12%" y1="90%" x2="88%" y2="90%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="12%" y1="84%" x2="12%" y2="94%" class="dim-line" />
+            <line x1="88%" y1="84%" x2="88%" y2="94%" class="dim-line" />
+            <!-- 總寬標注線 (縱向) -->
+            <line x1="94%" y1="18%" x2="94%" y2="82%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="88%" y1="18%" x2="97%" y2="18%" class="dim-line" />
+            <line x1="88%" y1="82%" x2="97%" y2="82%" class="dim-line" />
+            <!-- 軸距標注線 -->
+            <line x1="28%" y1="18%" x2="72%" y2="18%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="28%" y1="14%" x2="28%" y2="24%" class="dim-line" />
+            <line x1="72%" y1="14%" x2="72%" y2="24%" class="dim-line" />
+          </svg>
+          <div class="cad-dim-label" style="left:50%; bottom:6px; transform:translateX(-50%);">158.0 mm (全長)</div>
+          <div class="cad-dim-label vert" style="right:6px; top:50%; transform:translateY(-50%);">90.0 mm (全寬)</div>
+          <div class="cad-dim-label" style="left:50%; top:50px; transform:translateX(-50%);">96.0 mm (前後軸距)</div>
+        </div>
+      </div>
+
+      <!-- 右上：3D 透視/等角視圖 (ISOMETRIC / 3D) -->
+      <div class="quad-pane quad-pane-tr" id="pane-iso">
+        <div class="quad-header">
+          <div class="quad-title-group">
+            <span class="quad-title">🏎️ 3D 等角透視 · ISOMETRIC</span>
+            <span class="quad-badge" style="color:#00ff88; border-color:rgba(0,255,136,0.3); background:rgba(0,255,136,0.1);">360° 自由軌道</span>
+          </div>
+          <button class="quad-btn" style="border-color:#10b981; color:#10b981;" onclick="exportCADDrawing()" title="立即匯出 2.5K CAD 工程三視圖圖紙 (PNG)">📸 匯出圖紙</button>
+          <button class="quad-btn" onclick="setSingleView('3d')" title="單獨全螢幕檢視 3D 視角">⛶ 全螢幕</button>
+        </div>
+      </div>
+
+      <!-- 左下：正視圖 / 前視圖 (FRONT VIEW) -->
+      <div class="quad-pane quad-pane-bl" id="pane-front">
+        <div class="quad-header">
+          <div class="quad-title-group">
+            <span class="quad-title">📐 正前視圖 · FRONT VIEW</span>
+            <span class="quad-badge">正交 1:1</span>
+            <span class="quad-dim-tag">寬 90mm × 高 46mm</span>
+          </div>
+          <button class="quad-btn" onclick="setOrthographicView('front')" title="單獨全螢幕檢視前視圖">⛶ 全螢幕</button>
+        </div>
+        <div class="cad-dim-overlay">
+          <svg class="cad-dim-svg">
+            <!-- 總寬 -->
+            <line x1="16%" y1="18%" x2="84%" y2="18%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="16%" y1="14%" x2="16%" y2="28%" class="dim-line" />
+            <line x1="84%" y1="14%" x2="84%" y2="28%" class="dim-line" />
+            <!-- 輪距 -->
+            <line x1="22%" y1="78%" x2="78%" y2="78%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <!-- 總高 -->
+            <line x1="93%" y1="36%" x2="93%" y2="76%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="87%" y1="36%" x2="96%" y2="36%" class="dim-line" />
+            <line x1="87%" y1="76%" x2="96%" y2="76%" class="dim-line" />
+          </svg>
+          <div class="cad-dim-label" style="left:50%; top:50px; transform:translateX(-50%);">90.0 mm (全寬)</div>
+          <div class="cad-dim-label" style="left:50%; bottom:36px; transform:translateX(-50%);">76.0 mm (輪距)</div>
+          <div class="cad-dim-label vert" style="right:6px; top:54%; transform:translateY(-50%);">46.0 mm (全高)</div>
+          <div class="cad-dim-label" style="left:50%; bottom:10px; transform:translateX(-50%); font-size:0.68rem; color:#38bdf8;">離地間隙 7.5mm</div>
+        </div>
+      </div>
+
+      <!-- 右下：側視圖 (SIDE VIEW) -->
+      <div class="quad-pane quad-pane-br" id="pane-side">
+        <div class="quad-header">
+          <div class="quad-title-group">
+            <span class="quad-title">📐 正側視圖 · SIDE VIEW</span>
+            <span class="quad-badge">正交 1:1</span>
+            <span class="quad-dim-tag">長 158mm × 高 46mm</span>
+          </div>
+          <button class="quad-btn" onclick="setOrthographicView('side')" title="單獨全螢幕檢視側視圖">⛶ 全螢幕</button>
+        </div>
+        <div class="cad-dim-overlay">
+          <svg class="cad-dim-svg">
+            <!-- 總長 -->
+            <line x1="12%" y1="18%" x2="88%" y2="18%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="12%" y1="14%" x2="12%" y2="28%" class="dim-line" />
+            <line x1="88%" y1="14%" x2="88%" y2="28%" class="dim-line" />
+            <!-- 軸距 -->
+            <line x1="28%" y1="78%" x2="72%" y2="78%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="28%" y1="68%" x2="28%" y2="82%" class="dim-line" />
+            <line x1="72%" y1="68%" x2="72%" y2="82%" class="dim-line" />
+            <!-- 總高 -->
+            <line x1="93%" y1="36%" x2="93%" y2="76%" class="dim-solid" marker-start="url(#arr-cyan-start)" marker-end="url(#arr-cyan-end)" />
+            <line x1="87%" y1="36%" x2="96%" y2="36%" class="dim-line" />
+            <line x1="87%" y1="76%" x2="96%" y2="76%" class="dim-line" />
+          </svg>
+          <div class="cad-dim-label" style="left:50%; top:50px; transform:translateX(-50%);">158.0 mm (全長)</div>
+          <div class="cad-dim-label" style="left:50%; bottom:36px; transform:translateX(-50%);">96.0 mm (前後軸距)</div>
+          <div class="cad-dim-label" style="left:28%; bottom:10px; transform:translateX(-50%); font-size:0.68rem;">前輪 Ø36mm</div>
+          <div class="cad-dim-label" style="left:72%; bottom:10px; transform:translateX(-50%); font-size:0.68rem;">後輪 Ø36mm</div>
+          <div class="cad-dim-label vert" style="right:6px; top:54%; transform:translateY(-50%);">46.0 mm (全高)</div>
+        </div>
+      </div>
+
+      <div class="quad-center-badge">
+        <span onclick="resetOrthoZoom()" title="點擊重設三視圖正交縮放 (100%)">⚡ CAD 3-VIEW <span id="ortho-zoom-indicator" style="color:#94a3b8; font-size:0.62rem;">100%</span></span>
+        <span style="color:rgba(255,255,255,0.2);">|</span>
+        <span onclick="exportCADDrawing()" title="點擊立即匯出高解析度 CAD 工程圖紙 (PNG)" style="color:#10b981; cursor:pointer;">📸 匯出圖紙</span>
+      </div>
     </div>
   </div>
 
@@ -151,11 +475,23 @@
     </div>
 
     <div class="panel-section">
-      <div class="panel-title">⚡ 視角與功能</div>
+      <div class="panel-title">
+        <span>📐 CAD 工程視圖與投影</span>
+        <button id="dim-toggle-btn" onclick="toggleDimensions()" style="background:none; border:none; color:var(--primary); font-family:'JetBrains Mono'; font-size:0.7rem; cursor:pointer; font-weight:600;">📏 尺寸標注 ON</button>
+      </div>
       <div class="btn-group">
-        <button style="border-color:#00f0ff; color:#00f0ff;" onclick="setView('underbody')">🔍 仰視底盤細節</button>
-        <button onclick="toggleUnderglow()">🌌 車底霓虹燈</button>
+        <button style="border-color:#10b981; color:#10b981; background:rgba(16,185,129,0.12); font-weight:700; grid-column: span 2;" onclick="exportCADDrawing()">
+          📸 匯出 CAD 工程圖紙 (2.5K PNG)
+        </button>
+        <button id="btn-quad-view" style="border-color:#00f0ff; color:#00f0ff; grid-column: span 2; font-weight:700; background:rgba(0,240,255,0.12);" onclick="toggleMultiView()">
+          📐 CAD 工程三視圖 (四分屏)
+        </button>
+        <button onclick="setOrthographicView('top')">📐 正俯視 (正交)</button>
+        <button onclick="setOrthographicView('front')">📐 正前視 (正交)</button>
+        <button onclick="setOrthographicView('side')">📐 正側視 (正交)</button>
+        <button onclick="setView('underbody')">🔍 仰視底盤細節</button>
         <button onclick="resetCamera()">🎯 經典超跑視角</button>
+        <button onclick="toggleUnderglow()">🌌 車底霓虹燈</button>
         <button onclick="toggleAutoRotate()">🔄 360°巡航旋轉</button>
       </div>
     </div>
@@ -171,6 +507,13 @@
     let carGroup, bodyGroup, chassisGroup, aeroGroup, wheelsGroup = [];
     let bodyMaterial, carbonMaterial, glassMaterial, headlightMaterial, taillightMaterial, underglowLight;
 
+    // CAD 工程三視圖系統變數
+    let displayMode = 'single'; // 'single' 或 'quad'
+    let singleSubMode = '3d';   // '3d', 'ortho-top', 'ortho-front', 'ortho-side'
+    let orthoCamTop, orthoCamFront, orthoCamSide, orthoCamRear;
+    let orthoZoom = 1.0;
+    let showDimensions = true;
+
     function init() {
       const container = document.getElementById('canvas-container');
       scene = new THREE.Scene();
@@ -178,6 +521,27 @@
 
       camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 2000);
       camera.position.set(180, 110, 195);
+
+      // CAD 工程正交相機群組
+      orthoCamTop = new THREE.OrthographicCamera(-100, 100, 100, -100, 1, 2000);
+      orthoCamTop.position.set(0, 400, 0);
+      orthoCamTop.lookAt(0, 15, 0);
+      orthoCamTop.up.set(0, 0, -1);
+
+      orthoCamFront = new THREE.OrthographicCamera(-100, 100, 100, -100, 1, 2000);
+      orthoCamFront.position.set(400, 20, 0);
+      orthoCamFront.lookAt(0, 20, 0);
+      orthoCamFront.up.set(0, 1, 0);
+
+      orthoCamSide = new THREE.OrthographicCamera(-100, 100, 100, -100, 1, 2000);
+      orthoCamSide.position.set(0, 20, 400);
+      orthoCamSide.lookAt(0, 20, 0);
+      orthoCamSide.up.set(0, 1, 0);
+
+      orthoCamRear = new THREE.OrthographicCamera(-100, 100, 100, -100, 1, 2000);
+      orthoCamRear.position.set(-400, 20, 0);
+      orthoCamRear.lookAt(0, 20, 0);
+      orthoCamRear.up.set(0, 1, 0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
@@ -192,6 +556,41 @@
 
       // ★ 支援完整 360° 仰視看底盤 ★
       controls.maxPolarAngle = Math.PI;
+
+      // 分屏滑鼠互動
+      container.addEventListener('mousemove', (e) => {
+        if (displayMode === 'quad') {
+          const rect = container.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          const halfW = container.clientWidth / 2;
+          const halfH = container.clientHeight / 2;
+          controls.enabled = (mx >= halfW && my < halfH);
+        }
+      });
+
+      container.addEventListener('wheel', (e) => {
+        if (displayMode === 'quad') {
+          const rect = container.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          const halfW = container.clientWidth / 2;
+          const halfH = container.clientHeight / 2;
+          if (!(mx >= halfW && my < halfH)) {
+            e.preventDefault();
+            const zoomDelta = e.deltaY > 0 ? 0.93 : 1.07;
+            orthoZoom = Math.min(Math.max(orthoZoom * zoomDelta, 0.45), 3.2);
+            const ind = document.getElementById('ortho-zoom-indicator');
+            if (ind) ind.textContent = Math.round(orthoZoom * 100) + '%';
+          }
+        } else if (displayMode === 'single' && singleSubMode.startsWith('ortho-')) {
+          e.preventDefault();
+          const zoomDelta = e.deltaY > 0 ? 0.93 : 1.07;
+          orthoZoom = Math.min(Math.max(orthoZoom * zoomDelta, 0.35), 4.5);
+          const ind = document.getElementById('ortho-zoom-indicator');
+          if (ind) ind.textContent = Math.round(orthoZoom * 100) + '%';
+        }
+      }, { passive: false });
 
       // 燈光
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
@@ -478,12 +877,95 @@
 
     function toggleAutoRotate() { autoRotate = !autoRotate; }
 
+    function updateOrthoFrustum(cam, width, height) {
+      const aspect = width / height;
+      const halfH = 68 / orthoZoom;
+      const halfW = halfH * aspect;
+      cam.left = -halfW;
+      cam.right = halfW;
+      cam.top = halfH;
+      cam.bottom = -halfH;
+      cam.updateProjectionMatrix();
+    }
+
+    function toggleMultiView() {
+      if (displayMode === 'single') {
+        displayMode = 'quad';
+        singleSubMode = '3d';
+        autoRotate = false;
+        if (carGroup) carGroup.rotation.set(0, 0, 0);
+        camera.position.set(180, 110, 195);
+        controls.target.set(0, 15, 0);
+        controls.update();
+
+        document.getElementById('quadview-overlay').classList.add('active');
+        document.getElementById('single-ortho-banner').classList.remove('active');
+      } else {
+        setSingleView('3d');
+      }
+    }
+
+    function setSingleView(mode) {
+      displayMode = 'single';
+      singleSubMode = mode;
+      document.getElementById('quadview-overlay').classList.remove('active');
+      document.getElementById('single-ortho-banner').classList.remove('active');
+      controls.enabled = true;
+      if (mode === '3d') {
+        controls.target.set(0, 15, 0);
+        controls.update();
+      }
+    }
+
+    function setOrthographicView(name) {
+      autoRotate = false;
+      if (carGroup) carGroup.rotation.set(0, 0, 0);
+
+      displayMode = 'single';
+      singleSubMode = 'ortho-' + name;
+      document.getElementById('quadview-overlay').classList.remove('active');
+
+      const banner = document.getElementById('single-ortho-banner');
+      const title = document.getElementById('ortho-title');
+      const names = {
+        'top': '正俯視圖 (TOP VIEW)',
+        'front': '正前視圖 (FRONT VIEW)',
+        'side': '正側視圖 (SIDE VIEW)',
+        'rear': '正後視圖 (REAR VIEW)'
+      };
+      title.textContent = names[name] || name;
+      banner.classList.add('active');
+
+      controls.enabled = false;
+    }
+
+    function toggleDimensions() {
+      showDimensions = !showDimensions;
+      const overlays = document.querySelectorAll('.cad-dim-overlay');
+      overlays.forEach(el => {
+        el.style.display = showDimensions ? 'block' : 'none';
+      });
+      const btn = document.getElementById('dim-toggle-btn');
+      if (btn) {
+        btn.textContent = showDimensions ? '📏 尺寸標注 ON' : '📏 尺寸標注 OFF';
+        btn.style.color = showDimensions ? 'var(--primary)' : 'var(--text-muted)';
+      }
+    }
+
+    function resetOrthoZoom() {
+      orthoZoom = 1.0;
+      const ind = document.getElementById('ortho-zoom-indicator');
+      if (ind) ind.textContent = '100%';
+    }
+
     function resetCamera() {
+      setSingleView('3d');
       camera.position.set(180, 110, 195);
       controls.target.set(0, 15, 0);
     }
 
     function setView(v) {
+      setSingleView('3d');
       if (v === 'underbody') {
         camera.position.set(110, -85, 140);
       } else if (v === 'top') {
@@ -501,9 +983,647 @@
 
     function animate() {
       requestAnimationFrame(animate);
-      if (autoRotate && carGroup) carGroup.rotation.y += 0.007;
-      controls.update();
-      renderer.render(scene, camera);
+      if (autoRotate && carGroup && displayMode === 'single' && singleSubMode === '3d') {
+        carGroup.rotation.y += 0.007;
+      }
+
+      const c = document.getElementById('canvas-container');
+      const w = c.clientWidth;
+      const h = c.clientHeight;
+
+      if (displayMode === 'quad') {
+        controls.update();
+
+        const halfW = Math.floor(w / 2);
+        const halfH = Math.floor(h / 2);
+        const topH = h - halfH;
+        const rightW = w - halfW;
+
+        renderer.autoClear = false;
+        renderer.clear();
+
+        // 1. 左上：俯視圖 (TOP VIEW - 正交)
+        renderer.setViewport(0, halfH, halfW, topH);
+        renderer.setScissor(0, halfH, halfW, topH);
+        renderer.setScissorTest(true);
+        updateOrthoFrustum(orthoCamTop, halfW, topH);
+        renderer.render(scene, orthoCamTop);
+
+        // 2. 右上：3D 透視圖 (ISOMETRIC / 3D)
+        renderer.setViewport(halfW, halfH, rightW, topH);
+        renderer.setScissor(halfW, halfH, rightW, topH);
+        renderer.setScissorTest(true);
+        camera.aspect = rightW / topH;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+
+        // 3. 左下：正前視圖 (FRONT VIEW - 正交)
+        renderer.setViewport(0, 0, halfW, halfH);
+        renderer.setScissor(0, 0, halfW, halfH);
+        renderer.setScissorTest(true);
+        updateOrthoFrustum(orthoCamFront, halfW, halfH);
+        renderer.render(scene, orthoCamFront);
+
+        // 4. 右下：正側視圖 (SIDE VIEW - 正交)
+        renderer.setViewport(halfW, 0, rightW, halfH);
+        renderer.setScissor(halfW, 0, rightW, halfH);
+        renderer.setScissorTest(true);
+        updateOrthoFrustum(orthoCamSide, rightW, halfH);
+        renderer.render(scene, orthoCamSide);
+
+      } else {
+        renderer.autoClear = true;
+        renderer.setScissorTest(false);
+        renderer.setViewport(0, 0, w, h);
+
+        let activeCam = camera;
+        if (singleSubMode === 'ortho-top') activeCam = orthoCamTop;
+        else if (singleSubMode === 'ortho-front') activeCam = orthoCamFront;
+        else if (singleSubMode === 'ortho-side') activeCam = orthoCamSide;
+        else if (singleSubMode === 'ortho-rear') activeCam = orthoCamRear;
+
+        if (activeCam !== camera) {
+          updateOrthoFrustum(activeCam, w, h);
+        } else {
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          controls.update();
+        }
+
+        renderer.render(scene, activeCam);
+      }
+    }
+
+    // ==========================================
+    // 高解析度 CAD 工程三視圖圖紙匯出系統 (2.5K 2400x1500)
+    // ==========================================
+    function showToast(msg, duration = 3500) {
+      let toast = document.getElementById('cyber-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'cyber-toast';
+        toast.style.cssText = 'position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(10,16,28,0.96); border:1px solid #10b981; color:#e2e8f0; padding:11px 24px; border-radius:10px; font-family:"JetBrains Mono",monospace; font-size:0.85rem; font-weight:600; box-shadow:0 8px 32px rgba(0,0,0,0.85), 0 0 20px rgba(16,185,129,0.35); z-index:99999; opacity:0; transition:all 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events:none; display:flex; align-items:center; gap:10px;';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = msg;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+      }, duration);
+    }
+
+    function exportCADDrawing() {
+      showToast('⚙️ 正在生成 2.5K CAD 工程三視圖圖紙 (2400×1500)...', 3000);
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          try {
+            generateAndDownloadCADDrawing();
+          } catch (err) {
+            console.error('CAD Export Error:', err);
+            showToast('❌ 匯出失敗：' + err.message, 4000);
+          }
+        }, 60);
+      });
+    }
+
+    function generateAndDownloadCADDrawing() {
+      const exportW = 2400;
+      const exportH = 1500;
+
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = exportW;
+      offCanvas.height = exportH;
+
+      const offRenderer = new THREE.WebGLRenderer({
+        canvas: offCanvas,
+        antialias: true,
+        alpha: false,
+        preserveDrawingBuffer: true
+      });
+      offRenderer.setSize(exportW, exportH, false);
+      offRenderer.setPixelRatio(1);
+      offRenderer.shadowMap.enabled = true;
+      offRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      offRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      offRenderer.toneMappingExposure = 1.25;
+
+      const origRotY = carGroup ? carGroup.rotation.y : 0;
+      if (carGroup) carGroup.rotation.set(0, 0, 0);
+
+      const marginX = 40;
+      const marginY = 80;
+      const viewW = 1140;
+      const viewH = 670;
+
+      offRenderer.setClearColor(0x060912, 1);
+      offRenderer.autoClear = false;
+      offRenderer.clear();
+
+      // (1) 左上：俯視圖 (TOP VIEW)
+      const topY = exportH - marginY - viewH; // = 750
+      offRenderer.setViewport(marginX, topY, viewW, viewH);
+      offRenderer.setScissor(marginX, topY, viewW, viewH);
+      offRenderer.setScissorTest(true);
+      updateOrthoFrustum(orthoCamTop, viewW, viewH);
+      offRenderer.render(scene, orthoCamTop);
+
+      // (2) 右上：3D 透視等角圖 (ISOMETRIC 3D)
+      const isoX = exportW - marginX - viewW; // = 1220
+      offRenderer.setViewport(isoX, topY, viewW, viewH);
+      offRenderer.setScissor(isoX, topY, viewW, viewH);
+      offRenderer.setScissorTest(true);
+      const isoCam = new THREE.PerspectiveCamera(38, viewW / viewH, 0.1, 3000);
+      isoCam.position.set(195, 120, 205);
+      isoCam.lookAt(0, 16, 0);
+      offRenderer.render(scene, isoCam);
+
+      // (3) 左下：正前視圖 (FRONT VIEW)
+      offRenderer.setViewport(marginX, 50, viewW, viewH);
+      offRenderer.setScissor(marginX, 50, viewW, viewH);
+      offRenderer.setScissorTest(true);
+      updateOrthoFrustum(orthoCamFront, viewW, viewH);
+      offRenderer.render(scene, orthoCamFront);
+
+      // (4) 右下：正側視圖 (SIDE VIEW)
+      offRenderer.setViewport(isoX, 50, viewW, viewH);
+      offRenderer.setScissor(isoX, 50, viewW, viewH);
+      offRenderer.setScissorTest(true);
+      updateOrthoFrustum(orthoCamSide, viewW, viewH);
+      offRenderer.render(scene, orthoCamSide);
+
+      // 建立最終合成 2D Canvas
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = exportW;
+      finalCanvas.height = exportH;
+      const ctx = finalCanvas.getContext('2d');
+
+      ctx.fillStyle = '#060912';
+      ctx.fillRect(0, 0, exportW, exportH);
+
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x <= exportW; x += 40) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, exportH);
+      }
+      for (let y = 0; y <= exportH; y += 40) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(exportW, y);
+      }
+      ctx.stroke();
+
+      ctx.drawImage(offCanvas, 0, 0);
+      offRenderer.dispose();
+
+      drawDrawingBorders(ctx, exportW, exportH);
+      drawDividersAndBadges(ctx, exportW, exportH);
+      drawCADDimensions(ctx);
+      drawSpecificationsTable(ctx);
+      drawEngineeringTitleBlock(ctx);
+
+      finalCanvas.toBlob(blob => {
+        if (!blob) throw new Error('無法生成圖片 Blob');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const now = new Date();
+        const dateStr = now.getFullYear() + '' + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+        a.href = url;
+        a.download = `cyber_hypercar_cad_3view_${dateStr}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        showToast('✅ CAD 工程三視圖圖紙已成功匯出 (2400×1500 2.5K PNG)！', 4500);
+      }, 'image/png');
+
+      if (carGroup) carGroup.rotation.y = origRotY;
+    }
+
+    function drawArrowHead(ctx, fromX, fromY, toX, toY, size = 9) {
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+      ctx.save();
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - size * Math.cos(angle - Math.PI / 7), toY - size * Math.sin(angle - Math.PI / 7));
+      ctx.lineTo(toX - size * Math.cos(angle + Math.PI / 7), toY - size * Math.sin(angle + Math.PI / 7));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawCADDimHoriz(ctx, x1, x2, y, label, extY1, extY2) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(x1, extY1);
+      ctx.lineTo(x1, extY2);
+      ctx.moveTo(x2, extY1);
+      ctx.lineTo(x2, extY2);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.85)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x2, y);
+      ctx.stroke();
+
+      drawArrowHead(ctx, x1 + 25, y, x1, y, 9);
+      drawArrowHead(ctx, x2 - 25, y, x2, y, 9);
+
+      const midX = (x1 + x2) / 2;
+      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const textW = ctx.measureText(label).width + 16;
+      ctx.fillStyle = 'rgba(6, 12, 22, 0.95)';
+      ctx.fillRect(midX - textW / 2, y - 11, textW, 22);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.55)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(midX - textW / 2, y - 11, textW, 22);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText(label, midX, y);
+      ctx.restore();
+    }
+
+    function drawCADDimVert(ctx, y1, y2, x, label, extX1, extX2) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(extX1, y1);
+      ctx.lineTo(extX2, y1);
+      ctx.moveTo(extX1, y2);
+      ctx.lineTo(extX2, y2);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.85)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(x, y1);
+      ctx.lineTo(x, y2);
+      ctx.stroke();
+
+      drawArrowHead(ctx, x, y1 + 25, x, y1, 9);
+      drawArrowHead(ctx, x, y2 - 25, x, y2, 9);
+
+      const midY = (y1 + y2) / 2;
+      ctx.save();
+      ctx.translate(x, midY);
+      ctx.rotate(-Math.PI / 2);
+      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const textW = ctx.measureText(label).width + 16;
+      ctx.fillStyle = 'rgba(6, 12, 22, 0.95)';
+      ctx.fillRect(-textW / 2, -11, textW, 22);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.55)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-textW / 2, -11, textW, 22);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText(label, 0, 0);
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawDrawingBorders(ctx, w, h) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(18, 18, w - 36, h - 36);
+
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.75)';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(30, 30, w - 60, h - 60);
+
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#64748b';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const hZones = ['1', '2', '3', '4', '5', '6', '7', '8'];
+      const zoneW = (w - 60) / 8;
+      hZones.forEach((lbl, idx) => {
+        const zx = 30 + (idx + 0.5) * zoneW;
+        ctx.fillText(lbl, zx, 24);
+        ctx.fillText(lbl, zx, h - 24);
+      });
+
+      const vZones = ['A', 'B', 'C', 'D', 'E', 'F'];
+      const zoneH = (h - 60) / 6;
+      vZones.forEach((lbl, idx) => {
+        const zy = 30 + (idx + 0.5) * zoneH;
+        ctx.fillText(lbl, 24, zy);
+        ctx.fillText(lbl, w - 24, zy);
+      });
+
+      ctx.font = 'bold 20px "Orbitron", "Inter", sans-serif';
+      ctx.fillStyle = '#00f0ff';
+      ctx.textAlign = 'center';
+      ctx.fillText('CYBER HYPERCAR DYNAMICS · CAD 3-VIEW ORTHOGRAPHIC BLUEPRINT', w / 2, 54);
+
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('ALL DIMENSIONS IN MILLIMETERS (mm) • SCALE 1:1 ORTHOGRAPHIC • THIRD ANGLE PROJECTION', w / 2, 70);
+
+      ctx.restore();
+    }
+
+    function drawDividersAndBadges(ctx, w, h) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.22)';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([8, 6]);
+
+      ctx.beginPath();
+      ctx.moveTo(1200, 80);
+      ctx.lineTo(1200, h - 35);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(35, 750);
+      ctx.lineTo(w - 35, 750);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const renderPaneHeader = (x, y, title, badge, spec, badgeColor = '#00f0ff') => {
+        ctx.save();
+        ctx.fillStyle = 'rgba(8, 14, 26, 0.9)';
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.fillRect(x, y, 420, 36);
+        ctx.strokeRect(x, y, 420, 36);
+
+        ctx.font = 'bold 14px "Orbitron", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(title, x + 12, y + 18);
+
+        ctx.font = 'bold 10px "JetBrains Mono", monospace';
+        ctx.fillStyle = badgeColor;
+        ctx.fillText(`[${badge}]`, x + 215, y + 18);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.fillText(spec, x + 285, y + 18);
+        ctx.restore();
+      };
+
+      renderPaneHeader(45, 88, '01. TOP VIEW 俯視圖', '正交 1:1', '長158 × 寬90 mm');
+      renderPaneHeader(1215, 88, '02. ISOMETRIC 3D 等角', '透視 3D', '360° 空力座艙', '#a855f7');
+      renderPaneHeader(45, 758, '03. FRONT VIEW 正前視', '正交 1:1', '寬90 × 高46 mm');
+      renderPaneHeader(1215, 758, '04. SIDE VIEW 正側視', '正交 1:1', '長158 × 高46 mm');
+
+      ctx.fillStyle = 'rgba(8, 14, 26, 0.95)';
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(1110, 735, 180, 30);
+      ctx.strokeRect(1110, 735, 180, 30);
+
+      ctx.font = 'bold 12px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⚡ CAD 3-VIEW 1:1', 1200, 750);
+
+      ctx.restore();
+    }
+
+    function drawCADDimensions(ctx) {
+      // 1. 俯視圖
+      drawCADDimHoriz(ctx, 221, 999, 145, '158.0 mm (全長 LENGTH)', 175, 138);
+      drawCADDimHoriz(ctx, 374, 846, 685, '96.0 mm (軸距 WHEELBASE)', 640, 695);
+      drawCADDimVert(ctx, 193, 637, 1070, '90.0 mm (全寬 WIDTH)', 1010, 1080);
+      drawCADDimVert(ctx, 228, 602, 145, '76.0 mm (輪距 TRACK)', 135, 205);
+
+      // 2. 正前視圖
+      drawCADDimHoriz(ctx, 388, 832, 915, '90.0 mm (車身全寬)', 945, 905);
+      drawCADDimHoriz(ctx, 423, 797, 1270, '76.0 mm (前輪距 FRONT TRACK)', 1225, 1280);
+      drawCADDimVert(ctx, 987, 1213.5, 900, '46.0 mm (全高 HEIGHT)', 845, 910);
+      drawCADDimVert(ctx, 1176.5, 1213.5, 315, '7.5 mm (離地高)', 305, 370);
+
+      // 3. 正側視圖
+      drawCADDimHoriz(ctx, 1401, 2179, 915, '158.0 mm (全長 LENGTH)', 945, 905);
+      drawCADDimHoriz(ctx, 1554, 2026, 1270, '96.0 mm (軸距 WHEELBASE)', 1225, 1280);
+      drawCADDimVert(ctx, 987, 1213.5, 2250, '46.0 mm (全高 HEIGHT)', 2195, 2260);
+
+      ctx.save();
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.textAlign = 'center';
+      ctx.fillText('前輪 Ø36.0mm', 2026, 1245);
+      ctx.fillText('後輪 Ø36.0mm', 1554, 1245);
+      ctx.restore();
+
+      // 4. 右上 3D 等角透視圖特徵引線
+      drawLeaderCallout(ctx, 1370, 160, 1630, 270, 'ACTIVE DUAL AERO SPOILER', '主動式雙層碳纖維空力尾翼');
+      drawLeaderCallout(ctx, 2010, 160, 1870, 310, 'TEARDROP LOW-DRAG CANOPY', '水滴流線極低風阻座艙 (Cd 0.22)');
+      drawLeaderCallout(ctx, 2210, 380, 2050, 430, 'LIGHTBLADE STAR-RING LED', '光刃曲面星環矩陣式日行燈');
+      drawLeaderCallout(ctx, 1420, 620, 1680, 520, 'VENTURI TUNNEL DIFFUSER', '平整化底板與文氏管擴散通道');
+    }
+
+    function drawLeaderCallout(ctx, labelX, labelY, targetX, targetY, engText, chiText) {
+      ctx.save();
+      const midX = (labelX < targetX) ? targetX - 50 : targetX + 50;
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(targetX, targetY);
+      ctx.arc(targetX, targetY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(targetX, targetY);
+      ctx.lineTo(midX, labelY);
+      ctx.lineTo(labelX, labelY);
+      ctx.stroke();
+
+      ctx.font = 'bold 11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.textAlign = (labelX < targetX) ? 'right' : 'left';
+      ctx.fillText(engText, labelX + (labelX < targetX ? -6 : 6), labelY - 3);
+
+      ctx.font = '10px "Inter", sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(chiText, labelX + (labelX < targetX ? -6 : 6), labelY + 12);
+      ctx.restore();
+    }
+
+    function drawSpecificationsTable(ctx) {
+      ctx.save();
+      const x = 50;
+      const y = 1320;
+      const w = 570;
+      const h = 136;
+
+      ctx.fillStyle = 'rgba(8, 14, 26, 0.94)';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(x, y, w, h);
+
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.12)';
+      ctx.fillRect(x, y, w, 24);
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = 'bold 11px "Orbitron", "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('📋 VEHICLE TECHNICAL SPECIFICATIONS · 車輛工程規格參數', x + 10, y + 12);
+
+      const rows = [
+        ['尺寸規格 DIMENSIONS', '長 158.0 × 寬 90.0 × 高 46.0 mm (1:1 CAD Model)'],
+        ['軸距與輪距 WHEELBASE', '軸距 96.0 mm / 前後輪距 76.0 mm (前後均勻配重 48:52)'],
+        ['底盤空力 AERODYNAMICS', '風阻 Cd 0.22 · 文氏管擴散通道 · 離地高 7.5 mm'],
+        ['驅動單元 POWERTRAIN', '雙諧波電磁馬達 AWD · 720 kW (980 hp) · 煞車回充'],
+        ['列印製程 FABRICATION', '3D 列印套件 (STL 模組化底盤 / 車殼一體成型)']
+      ];
+
+      ctx.font = '10px "JetBrains Mono", monospace';
+      rows.forEach((row, i) => {
+        const ry = y + 36 + i * 20;
+        ctx.fillStyle = '#94a3b8';
+        ctx.textAlign = 'left';
+        ctx.fillText(row[0], x + 10, ry);
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.textAlign = 'left';
+        ctx.fillText(row[1], x + 190, ry);
+
+        if (i < rows.length - 1) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.beginPath();
+          ctx.moveTo(x + 5, ry + 9);
+          ctx.lineTo(x + w - 5, ry + 9);
+          ctx.stroke();
+        }
+      });
+      ctx.restore();
+    }
+
+    function drawEngineeringTitleBlock(ctx) {
+      ctx.save();
+      const x = 1680;
+      const y = 1320;
+      const w = 680;
+      const h = 136;
+
+      ctx.fillStyle = 'rgba(8, 14, 26, 0.96)';
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.65)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x, y, w, h);
+
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, y + 36);
+      ctx.lineTo(x + w, y + 36);
+      ctx.moveTo(x, y + 70);
+      ctx.lineTo(x + w, y + 70);
+      ctx.moveTo(x, y + 104);
+      ctx.lineTo(x + w, y + 104);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x + 470, y);
+      ctx.lineTo(x + 470, y + h);
+      ctx.stroke();
+
+      ctx.font = 'bold 13px "Orbitron", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('CYBER HYPERCAR AUTOMOTIVE DYNAMICS', x + 12, y + 18);
+
+      drawThirdAngleProjection(ctx, x + 560, y + 18);
+      ctx.font = 'bold 9px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.textAlign = 'left';
+      ctx.fillText('3RD ANGLE', x + 615, y + 18);
+
+      ctx.font = 'bold 11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText('TITLE: 3-VIEW CAD ENGINEERING SPEC SHEET', x + 12, y + 53);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('DWG NO: CYBER-EV-2026-V3', x + 482, y + 53);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('SCALE: 1:1 METRIC | UNIT: mm | SHEET 1 OF 1', x + 12, y + 87);
+
+      ctx.fillStyle = '#10b981';
+      ctx.fillText('STATUS: APPROVED FOR CAD / STL', x + 482, y + 87);
+
+      const now = new Date();
+      const dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('DESIGN: CAD AI ADVANCED TEAM · AERODYNAMICS R&D', x + 12, y + 120);
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText(`DATE: ${dateStr}`, x + 482, y + 120);
+
+      ctx.restore();
+    }
+
+    function drawThirdAngleProjection(ctx, cx, cy) {
+      ctx.save();
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 1.2;
+
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(cx - 30, cy);
+      ctx.lineTo(cx + 38, cy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const coneL = cx - 24;
+      const coneR = cx - 8;
+      ctx.beginPath();
+      ctx.moveTo(coneL, cy - 11);
+      ctx.lineTo(coneR, cy - 6);
+      ctx.lineTo(coneR, cy + 6);
+      ctx.lineTo(coneL, cy + 11);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(coneL, cy - 11);
+      ctx.lineTo(coneL, cy + 11);
+      ctx.moveTo(coneR, cy - 6);
+      ctx.lineTo(coneR, cy + 6);
+      ctx.stroke();
+
+      const circleX = cx + 18;
+      ctx.beginPath();
+      ctx.arc(circleX, cy, 6, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(circleX, cy, 11, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.setLineDash([3, 2]);
+      ctx.beginPath();
+      ctx.moveTo(circleX, cy - 14);
+      ctx.lineTo(circleX, cy + 14);
+      ctx.stroke();
+      ctx.restore();
     }
 
     window.onload = init;
